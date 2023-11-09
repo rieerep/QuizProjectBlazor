@@ -18,11 +18,18 @@ namespace BlazorQuiz
 				options.UseSqlServer(connectionString));
 			builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-			builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+			builder.Services.AddDefaultIdentity<User>(
+				options =>
+				{
+					options.SignIn.RequireConfirmedAccount = false;
+					options.Password.RequireNonAlphanumeric = false;
+					options.Password.RequireLowercase = false;
+					options.Password.RequireUppercase = false;
+				})
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
 			builder.Services.AddIdentityServer()
-				.AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+				.AddApiAuthorization<User, ApplicationDbContext>();
 
 			builder.Services.AddAuthentication()
 				.AddIdentityServerJwt();

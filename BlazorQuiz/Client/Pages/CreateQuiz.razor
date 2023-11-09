@@ -1,0 +1,53 @@
+﻿	@page "/createquiz"
+	@using BlazorQuiz.Shared;
+	@using Microsoft.AspNetCore.Authorization
+	@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+	@attribute [Authorize]
+	@inject HttpClient Http
+
+
+	<h3>CreateQuiz</h3>
+
+	<AuthorizeView>
+		<Authorized>
+			<p>Create a quiz</p>
+			
+			<!-- Här sätter jag värdet på QuizViewModel.title-->
+			<form>
+			<input @bind="inputTitle" type="text" name="Name your quiz." />
+			<button @onclick=CreateQuizAsync>Add title</button>
+			</form>
+			@foreach (var title in titles ?? new List<QuizTitleViewModel>())
+			{
+				<li>
+					@title.PublicId
+				</li>
+			}
+
+			<!--Ska en bind till textfältet, onClick på button -->
+		</Authorized>
+		<NotAuthorized>
+			<p>Du måste logga in för att skapa ett quiz.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+@code {
+	// Skapa en metod med en POST som triggas på onClick
+	// skapa ett fält
+	//använda bind för att hämta input 
+	string? inputTitle;
+	private List<QuizTitleViewModel>? titles;
+
+	private async Task CreateQuizAsync()
+	{
+		QuizViewModel newQuiz = new QuizViewModel()
+			{
+				Title = inputTitle
+			};
+		var response = await Http.PostAsJsonAsync("api/quiz", newQuiz);
+		titles = await response.Content.ReadFromJsonAsync<List<QuizTitleViewModel>>();
+	}
+	// Ny tom modell - ge title i QuizViewModel ett värde
+		
+
+	}

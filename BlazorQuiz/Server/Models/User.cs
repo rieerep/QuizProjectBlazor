@@ -2,7 +2,7 @@
 
 namespace BlazorQuiz.Server.Models
 {
-	public class ApplicationUser : IdentityUser
+	public class User : IdentityUser
 	{
 	}
 }
