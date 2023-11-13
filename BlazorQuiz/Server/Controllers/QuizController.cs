@@ -23,19 +23,11 @@ namespace create_a_quiz.Server.Controllers
 			_userManager = userManager;
 		}
 
-
-		// GET: api/<CreateQuizController>
-		[HttpGet]
-        public IEnumerable<string> Get()
+        //GET api/get
+        [HttpGet]
+        public IEnumerable<QuizViewModel> Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<CreateQuizController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         // POST api/<CreateQuizController>
@@ -52,8 +44,9 @@ namespace create_a_quiz.Server.Controllers
             _context.Quizzes.Add(quiz);
             _context.SaveChanges();
 
-            QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
+            // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
 
+            QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
             return Ok(newQuizId);
         }
     }

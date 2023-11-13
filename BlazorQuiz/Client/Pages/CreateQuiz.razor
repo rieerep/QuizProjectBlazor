@@ -1,53 +1,46 @@
-﻿	@page "/createquiz"
-	@using BlazorQuiz.Shared;
-	@using Microsoft.AspNetCore.Authorization
-	@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-	@attribute [Authorize]
-	@inject HttpClient Http
+﻿@page "/createquiz"
+@using BlazorQuiz.Shared;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+@inject HttpClient Http
 
 
-	<h3>CreateQuiz</h3>
+<h3>CreateQuiz</h3>
 
-	<AuthorizeView>
-		<Authorized>
-			<p>Create a quiz</p>
-			
-			<!-- Här sätter jag värdet på QuizViewModel.title-->
-			<form>
-			<input @bind="inputTitle" type="text" name="Name your quiz." />
-			<button @onclick=CreateQuizAsync>Add title</button>
-			</form>
-			@foreach (var title in titles ?? new List<QuizTitleViewModel>())
-			{
-				<li>
-					@title.PublicId
-				</li>
-			}
+@* <AuthorizeView>
+    <Authorized> *@
+        <!-- Här sätter jag värdet på QuizViewModel.title-->
+        <form>
+            <input @bind="inputTitle" type="text" />
+            <input type="submit" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
+        </form>
 
-			<!--Ska en bind till textfältet, onClick på button -->
-		</Authorized>
-		<NotAuthorized>
-			<p>Du måste logga in för att skapa ett quiz.</p>
-		</NotAuthorized>
-	</AuthorizeView>
+        <p>@titles.PublicId</p>
+        <a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
+        <!--Länka till /addquestion/{publicid}-->
+
+        <!--Ska en bind till textfältet, onClick på button -->
+@*     </Authorized>
+    <NotAuthorized> *@
+        @* <p>Du måste logga in för att skapa ett quiz.</p> *@
+@*     </NotAuthorized>
+</AuthorizeView> *@
 
 @code {
-	// Skapa en metod med en POST som triggas på onClick
-	// skapa ett fält
-	//använda bind för att hämta input 
-	string? inputTitle;
-	private List<QuizTitleViewModel>? titles;
+    // skapa ett fält
+    //använda bind för att hämta input
+    string? inputTitle;
+    private QuizTitleViewModel titles = new QuizTitleViewModel();
 
-	private async Task CreateQuizAsync()
-	{
-		QuizViewModel newQuiz = new QuizViewModel()
-			{
-				Title = inputTitle
-			};
-		var response = await Http.PostAsJsonAsync("api/quiz", newQuiz);
-		titles = await response.Content.ReadFromJsonAsync<List<QuizTitleViewModel>>();
-	}
-	// Ny tom modell - ge title i QuizViewModel ett värde
-		
+    private async Task CreateQuizAsync()
+    {
+        QuizViewModel newQuiz = new QuizViewModel()
+            {
+                 Title = inputTitle
+            };
+        var response = await Http.PostAsJsonAsync("api/quiz/post", newQuiz);
+        titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
 
-	}
+    }
+}

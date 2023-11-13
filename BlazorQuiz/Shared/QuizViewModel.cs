@@ -8,6 +8,7 @@ namespace BlazorQuiz.Shared
 {
 	public class QuizViewModel
 	{
+		public Guid PublicId { get; set; }
 		public string? Title { get; set; }
 
 	}

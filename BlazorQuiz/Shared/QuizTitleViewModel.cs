@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace BlazorQuiz.Shared
 {
-	public class QuizTitleViewModel 
+	public class QuizTitleViewModel
 	{
-        public Guid PublicId { get; set; } = Guid.Empty;
+        public Guid PublicId { get; set; }
     }
 }

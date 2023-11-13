@@ -1,14 +1,41 @@
-﻿@page "/addquestion"
+﻿@page "/addquestion/{publicid}"
+@using Microsoft.AspNetCore
+@using BlazorQuiz.Shared
+@using static System.Net.WebRequestMethods;
+@inject HttpClient Http
+
 
 <h3>Add questions to your quiz</h3>
 
 <form>
-	<label>Question</label><br />
-	<input type="text" id="question" /><br />
-	<label>Answer</label><br />
-	<input type="text" id="answer" />
+	<label for="addquestion" >Question</label><br />
+
+	<input type="text" id="question" @bind="addedQuestion" /><br />
+	<label for="addquestion" id="question" >Answer</label><br />
+	<input type="text" id="answer" @bind=addedAnswer />
+	<input type="submit" value="Submit" @onclick=AddQuestion>Create quiz</input>
+
 </form>
 
 @code {
 
+	[Parameter]
+	public string PublicId { get; set; }
+	// 
+	private string addedQuestion;
+	private string addedAnswer;
+
+	private QuestionViewModel questions = new QuestionViewModel();
+
+	private async Task AddQuestion()
+	{
+		QuestionViewModel newQuestion = new QuestionViewModel()
+			{
+				Question = addedQuestion,
+				Answer = addedAnswer
+			};
+		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
+	}
+
+	//Lägg i question, answer och publicid i Questioncontrollern
 }
