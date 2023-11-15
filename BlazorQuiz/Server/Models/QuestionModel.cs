@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace create_a_quiz.Server.Models
 {
@@ -13,7 +14,8 @@ namespace create_a_quiz.Server.Models
         public virtual QuizModel? Quiz { get; set; }
         public string? Question { get; set; }
         public string? Answer { get; set; }
-        public string? Media { get; set; }
+
+        //public string? Media { get; set; }
 
     }
 }

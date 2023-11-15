@@ -4,20 +4,47 @@
 @using static System.Net.WebRequestMethods;
 @inject HttpClient Http
 
-
+<h4></h4>
 <h3>Add questions to your quiz</h3>
 
+<AuthorizeView>
+		<Authorized>
 <form>
 	<label for="addquestion" >Question</label><br />
-
 	<input type="text" id="question" @bind="addedQuestion" /><br />
 	<label for="addquestion" id="question" >Answer</label><br />
 	<input type="text" id="answer" @bind=addedAnswer />
-	<input type="submit" value="Submit" @onclick=AddQuestion>Create quiz</input>
+	<input type="button" value="Submit" @onclick=AddQuestion>Create quiz</input>
+	<br />
+	<p>Timed question?</p>
+	<input type="radio" id="notimer" name="timerchoice" />
+	<label for="notimer">No timer</label>
+			<input type="radio" id="timer" name="timerchoice" />
+			<label for="timer">Timer</label>
+	<br />
+	<button type="button" @onclick="() => ShowComponent = true">Lägg till</button> <button>button 2</button>
+	<input />
+			@if (ShowComponent)
+			{
+				<p>Show component 1</p>
+				<form>
+					<label for="addMedia">Add Media URL:</label>
+					<input type="text" id="addMedia" />
+				</form>
+			}
+
 
 </form>
+	</Authorized>
+	<NotAuthorized>
+		<p>Du måste logga in för att skapa ett quiz.</p>
+	</NotAuthorized>
+</AuthorizeView>
+
 
 @code {
+
+	bool ShowComponent { get; set; } = false;
 
 	[Parameter]
 	public string PublicId { get; set; }
@@ -31,9 +58,12 @@
 	{
 		QuestionViewModel newQuestion = new QuestionViewModel()
 			{
+
 				Question = addedQuestion,
-				Answer = addedAnswer
+				Answer = addedAnswer,
+				PublicId = PublicId
 			};
+
 		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 	}
 

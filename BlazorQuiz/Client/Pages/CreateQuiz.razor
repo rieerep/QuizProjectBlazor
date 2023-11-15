@@ -8,39 +8,44 @@
 
 <h3>CreateQuiz</h3>
 
-@* <AuthorizeView>
-    <Authorized> *@
-        <!-- Här sätter jag värdet på QuizViewModel.title-->
-        <form>
-            <input @bind="inputTitle" type="text" />
-            <input type="submit" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
-        </form>
+<AuthorizeView>
+	<Authorized>
+		<!-- Här sätter jag värdet på QuizViewModel.title-->
+		<form>
+			<input @bind="inputTitle" type="text" />
+			<input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
+		</form>
 
-        <p>@titles.PublicId</p>
-        <a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
-        <!--Länka till /addquestion/{publicid}-->
-
-        <!--Ska en bind till textfältet, onClick på button -->
-@*     </Authorized>
-    <NotAuthorized> *@
-        @* <p>Du måste logga in för att skapa ett quiz.</p> *@
-@*     </NotAuthorized>
-</AuthorizeView> *@
+		<p>@titles.PublicId</p>
+		<a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
+		<!--Länka till /addquestion/{publicid}-->
+		<!--Ska en bind till textfältet, onClick på button -->
+	</Authorized>
+	<NotAuthorized>
+		<p>Du måste logga in för att skapa ett quiz.</p>
+	</NotAuthorized>
+</AuthorizeView>
 
 @code {
-    // skapa ett fält
-    //använda bind för att hämta input
-    string? inputTitle;
-    private QuizTitleViewModel titles = new QuizTitleViewModel();
+	// skapa ett fält
+	//använda bind för att hämta input
+	string? inputTitle;
+	private QuizTitleViewModel titles = new QuizTitleViewModel();
 
-    private async Task CreateQuizAsync()
-    {
-        QuizViewModel newQuiz = new QuizViewModel()
-            {
-                 Title = inputTitle
-            };
-        var response = await Http.PostAsJsonAsync("api/quiz/post", newQuiz);
-        titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
+	private async Task CreateQuizAsync()
+	{
+		QuizViewModel newQuiz = new QuizViewModel()
+			{
+				Title = inputTitle
+			};
+		var response = await Http.PostAsJsonAsync("api/quiz", newQuiz);
+		if (response == null)
+		{
+			Console.WriteLine("Got null response");
+			return;
+		}
+		titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
+		StateHasChanged();
 
-    }
+	}
 }

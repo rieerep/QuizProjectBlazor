@@ -5,6 +5,7 @@ using create_a_quiz.Server.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BlazorQuiz.Server.Controllers
@@ -27,17 +28,16 @@ namespace BlazorQuiz.Server.Controllers
         public IActionResult Post([FromBody] QuestionViewModel model)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var currentQuiz = _context.Quizzes.Where(u => u.PublicId.ToString() == model.PublicId).Include(q => q.Questions).Single();
+            
             var question = new QuestionModel
             {
                 Question = model.Question,
                 Answer = model.Answer,
             };
-            //_context.Quizzes.Add(question);
+            currentQuiz.Questions.Add(question);
             _context.SaveChanges();
-
-            //Question newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
-
-            //QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
 
             return Ok();
         }

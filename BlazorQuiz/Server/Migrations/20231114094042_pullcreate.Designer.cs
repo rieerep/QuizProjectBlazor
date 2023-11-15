@@ -4,6 +4,7 @@ using BlazorQuiz.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorQuiz.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231114094042_pullcreate")]
+    partial class pullcreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,6 +102,9 @@ namespace BlazorQuiz.Server.Migrations
 
                     b.Property<int>("Fk_QuizId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Media")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Question")
                         .HasColumnType("nvarchar(max)");
@@ -416,7 +421,7 @@ namespace BlazorQuiz.Server.Migrations
             modelBuilder.Entity("create_a_quiz.Server.Models.QuestionModel", b =>
                 {
                     b.HasOne("create_a_quiz.Server.Models.QuizModel", "Quiz")
-                        .WithMany("Questions")
+                        .WithMany()
                         .HasForeignKey("Fk_QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -482,11 +487,6 @@ namespace BlazorQuiz.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("create_a_quiz.Server.Models.QuizModel", b =>
-                {
-                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

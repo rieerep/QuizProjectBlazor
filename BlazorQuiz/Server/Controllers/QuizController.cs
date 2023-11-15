@@ -25,10 +25,10 @@ namespace create_a_quiz.Server.Controllers
 
         //GET api/get
         [HttpGet]
-        public IEnumerable<QuizViewModel> Get()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        }
+        //public IEnumerable<QuizViewModel> Get()
+        //{
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //}
 
         // POST api/<CreateQuizController>
         [HttpPost]

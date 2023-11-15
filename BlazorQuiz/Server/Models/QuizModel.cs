@@ -16,5 +16,6 @@ namespace create_a_quiz.Server.Models
         public string? UserId { get; set; }
         public string? Title { get; set; }
         public virtual User? User { get; set; }
+        public ICollection<QuestionModel> Questions { get; set; }
     }
 }
