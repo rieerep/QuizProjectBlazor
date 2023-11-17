@@ -16,13 +16,20 @@
 	<input type="text" id="answer" @bind=addedAnswer />
 	<input type="button" value="Submit" @onclick=AddQuestion>Create quiz</input>
 	<br />
+
+	<!-- Timed Quesitons-->
 	<p>Timed question?</p>
-	<input type="radio" id="notimer" name="timerchoice" />
-	<label for="notimer">No timer</label>
-			<input type="radio" id="timer" name="timerchoice" />
-			<label for="timer">Timer</label>
-	<br />
-	<button type="button" @onclick="() => ShowComponent = true">Lägg till</button> <button>button 2</button>
+	<input type="radio" id="notimer" name="timerchoice" value="1" />
+	<label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
+	<input type="radio" id="timer" name="timerchoice" value="2" />
+	<label @onclick="() => ShowComponent = true">Timer</label>
+
+			@if (ShowComponent)
+			{
+				<p>Show component 1</p>
+			}
+			<br />
+	<button type="button" @onclick="() => ShowComponent = true">Upload</button> <button>button 2</button>
 	<input />
 			@if (ShowComponent)
 			{
@@ -32,8 +39,6 @@
 					<input type="text" id="addMedia" />
 				</form>
 			}
-
-
 </form>
 	</Authorized>
 	<NotAuthorized>
@@ -44,7 +49,8 @@
 
 @code {
 
-	bool ShowComponent { get; set; } = false;
+	bool ShowComponent { get; set; }
+	private string selectedRadio;
 
 	[Parameter]
 	public string PublicId { get; set; }
@@ -63,7 +69,6 @@
 				Answer = addedAnswer,
 				PublicId = PublicId
 			};
-
 		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 	}
 

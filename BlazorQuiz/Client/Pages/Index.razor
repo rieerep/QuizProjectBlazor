@@ -1,9 +1,46 @@
 ﻿@page "/"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HttpClient Http
+
+@using BlazorQuiz.Shared;
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+@{
+    var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
+    var user = authenticationStateTask.Result.User;
+}
 
-Welcome to your new app.
+@if (user.Identity?.IsAuthenticated ?? false)
+{
+    <h1>Welcome, @user.Identity.Name</h1>
+    
+    <h3>List of your quizzes:</h3>
+
+} else
+{
+    <h1>Hello, world!</h1>
+}
+
+
+
+Welcome to Quiz.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+
+@code {
+
+    // private QuizViewModel titles = new QuizViewModel();
+
+    // var response = await Http.
+
+    // data = await response.Content.ReadFromJsonAsync<QuizViewModel>();
+
+
+    // public async Task<QuizViewModel> GetQuiz()
+    // {
+    //     var quiz ?
+    // }
+
+}

@@ -10,10 +10,10 @@ using System.Security.Claims;
 
 namespace create_a_quiz.Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class QuizController : ControllerBase
-    {
+	[Route("api/[controller]")]
+	[ApiController]
+	public class QuizController : ControllerBase
+	{
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<User> _userManager;
 
@@ -23,31 +23,39 @@ namespace create_a_quiz.Server.Controllers
 			_userManager = userManager;
 		}
 
-        //GET api/get
-        [HttpGet]
-        //public IEnumerable<QuizViewModel> Get()
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //}
+		//GET api/get
+		[HttpGet]
 
-        // POST api/<CreateQuizController>
-        [HttpPost]
-        public IActionResult Post([FromBody] QuizViewModel model)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var quiz = new QuizModel
-            {
-                UserId = userId,
-                Title = model.Title,
-                PublicId = Guid.NewGuid()
-            };
-            _context.Quizzes.Add(quiz);
-            _context.SaveChanges();
+		public async Task Get()
+		{
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (userId == null)
+			{
+				throw new ArgumentNullException("userId");
+			}
 
-            // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
+			var response = await HttpClient
 
-            QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
-            return Ok(newQuizId);
-        }
-    }
+		}
+
+		// POST api/<CreateQuizController>
+		[HttpPost]
+		public IActionResult Post([FromBody] QuizViewModel model)
+		{
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			var quiz = new QuizModel
+			{
+				UserId = userId,
+				Title = model.Title,
+				PublicId = Guid.NewGuid()
+			};
+			_context.Quizzes.Add(quiz);
+			_context.SaveChanges();
+
+			// QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
+
+			QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
+			return Ok(newQuizId);
+		}
+	}
 }

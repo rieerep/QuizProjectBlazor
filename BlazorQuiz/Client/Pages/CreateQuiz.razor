@@ -15,11 +15,8 @@
 			<input @bind="inputTitle" type="text" />
 			<input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
 		</form>
-
 		<p>@titles.PublicId</p>
 		<a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
-		<!--Länka till /addquestion/{publicid}-->
-		<!--Ska en bind till textfältet, onClick på button -->
 	</Authorized>
 	<NotAuthorized>
 		<p>Du måste logga in för att skapa ett quiz.</p>
@@ -28,7 +25,6 @@
 
 @code {
 	// skapa ett fält
-	//använda bind för att hämta input
 	string? inputTitle;
 	private QuizTitleViewModel titles = new QuizTitleViewModel();
 
@@ -46,6 +42,5 @@
 		}
 		titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
 		StateHasChanged();
-
 	}
 }
