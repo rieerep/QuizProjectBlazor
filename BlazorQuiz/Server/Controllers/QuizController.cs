@@ -34,7 +34,9 @@ namespace create_a_quiz.Server.Controllers
 				throw new ArgumentNullException("userId");
 			}
 
-			var response = await HttpClient
+			var result = _context.Quizzes.ToList();
+
+			//return result;
 
 		}
 
