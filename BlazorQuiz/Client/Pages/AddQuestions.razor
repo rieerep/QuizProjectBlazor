@@ -8,38 +8,43 @@
 <h3>Add questions to your quiz</h3>
 
 <AuthorizeView>
-		<Authorized>
-<form>
-	<label for="addquestion" >Question</label><br />
-	<input type="text" id="question" @bind="addedQuestion" /><br />
-	<label for="addquestion" id="question" >Answer</label><br />
-	<input type="text" id="answer" @bind=addedAnswer />
-	<input type="button" value="Submit" @onclick=AddQuestion>Create quiz</input>
-	<br />
-
-	<!-- Timed Quesitons-->
-	<p>Timed question?</p>
-	<input type="radio" id="notimer" name="timerchoice" value="1" />
-	<label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
-	<input type="radio" id="timer" name="timerchoice" value="2" />
-	<label @onclick="() => ShowComponent = true">Timer</label>
-
-			@if (ShowComponent)
-			{
-				<p>Show component 1</p>
-			}
+	<Authorized>
+		<form>
+			<label for="addquestion">Question</label><br />
+			<input type="text" id="question" @bind="addedQuestion" /><br />
+			<label for="addquestion" id="question">Answer</label><br />
+			<input type="text" id="answer" @bind=addedAnswer />
+			<input type="button" value="Submit" @onclick=AddQuestion>Create quiz</input>
 			<br />
-	<button type="button" @onclick="() => ShowComponent = true">Upload</button> <button>button 2</button>
-	<input />
-			@if (ShowComponent)
-			{
-				<p>Show component 1</p>
-				<form>
-					<label for="addMedia">Add Media URL:</label>
-					<input type="text" id="addMedia" />
-				</form>
-			}
-</form>
+		</form>
+
+		<!-- Timed Quesitons-->
+		<p>Timed question?</p>
+		<form>
+			<input type="radio" id="notimer" name="timerchoice" value="1" />
+			<label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
+			<input type="radio" id="timer" name="timerchoice" value="2" />
+			<label @onclick="() => ShowComponent = true">Timer</label>
+		</form>
+		@if (ShowComponent)
+		{
+			<form>
+				
+			</form>
+			<p>Show component 1</p>
+
+		}
+		<br />
+		<button type="button" @onclick="() => ShowComponent = true">Upload</button> <button>button 2</button>
+		<input />
+		@if (ShowComponent)
+		{
+			<p>Show component 1</p>
+			<form>
+				<label for="addMedia">Add Media URL:</label>
+				<input type="text" id="addMedia" />
+			</form>
+		}
 	</Authorized>
 	<NotAuthorized>
 		<p>Du måste logga in för att skapa ett quiz.</p>
@@ -54,7 +59,7 @@
 
 	[Parameter]
 	public string PublicId { get; set; }
-	// 
+	//
 	private string addedQuestion;
 	private string addedAnswer;
 
@@ -64,7 +69,6 @@
 	{
 		QuestionViewModel newQuestion = new QuestionViewModel()
 			{
-
 				Question = addedQuestion,
 				Answer = addedAnswer,
 				PublicId = PublicId
