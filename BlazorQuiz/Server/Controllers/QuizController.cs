@@ -24,20 +24,22 @@ namespace create_a_quiz.Server.Controllers
 		}
 
 		//GET api/get
-		[HttpGet]
+		[HttpGet("get")]
 
-		public async Task Get()
+		public async Task<IEnumerable<QuizViewModel>> Get()
 		{
+
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			if (userId == null)
 			{
 				throw new ArgumentNullException("userId");
 			}
 
-			var result = _context.Quizzes.ToList();
+			var quizInfo = _context.Quizzes.Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId}).ToList();
 
-			//return result;
+			var userQuizzes = _context.Quizzes.Where(u => u.UserId == userId).Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId}).ToList();
 
+			return userQuizzes;
 		}
 
 		// POST api/<CreateQuizController>
