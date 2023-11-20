@@ -9,7 +9,11 @@ namespace BlazorQuiz.Shared
     public class QuestionViewModel
     {
         public string Question { get; set; }
+
         public string Answer { get; set; }
+
         public string PublicId { get; set; }
+
+        public int Timer {  get; set; }
     }
 }

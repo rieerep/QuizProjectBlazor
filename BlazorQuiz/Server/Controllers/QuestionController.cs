@@ -35,6 +35,7 @@ namespace BlazorQuiz.Server.Controllers
             {
                 Question = model.Question,
                 Answer = model.Answer,
+                Timer = model.Timer
             };
             currentQuiz.Questions.Add(question);
             _context.SaveChanges();

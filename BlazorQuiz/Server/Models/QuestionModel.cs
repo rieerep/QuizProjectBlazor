@@ -11,9 +11,14 @@ namespace create_a_quiz.Server.Models
 
         [ForeignKey("Quiz")]
         public int Fk_QuizId { get; set; }
+
         public virtual QuizModel? Quiz { get; set; }
+
         public string? Question { get; set; }
+
         public string? Answer { get; set; }
+
+        public int Timer { get; set; }
 
         //public string? Media { get; set; }
 

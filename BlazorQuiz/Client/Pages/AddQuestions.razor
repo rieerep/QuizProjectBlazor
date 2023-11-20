@@ -1,14 +1,19 @@
 ﻿@page "/addquestion/{publicid}"
+@inject HttpClient Http
+@inject IConfiguration config
+
 @using Microsoft.AspNetCore
 @using BlazorQuiz.Shared
 @using static System.Net.WebRequestMethods;
-@inject HttpClient Http
+
 
 <h4></h4>
 <h3>Add questions to your quiz</h3>
 
 <AuthorizeView>
 	<Authorized>
+
+		<!--Add question-->
 		<form>
 			<label for="addquestion">Question</label><br />
 			<input type="text" id="question" @bind="addedQuestion" /><br />
@@ -18,23 +23,35 @@
 			<br />
 		</form>
 
+		<!-- Multiple Question alternative-->
+		<h4>Flervalsfråga?</h4>
+
 		<!-- Timed Quesitons-->
 		<p>Timed question?</p>
 		<form>
-			<input type="radio" id="notimer" name="timerchoice" value="1" />
-			<label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
+			<input type="radio" id="notimer" name="timerchoice" value="0" />
+			<label @onclick="() => ShowComponent = false" name="No timer" >No timer</label>
 			<input type="radio" id="timer" name="timerchoice" value="2" />
 			<label @onclick="() => ShowComponent = true">Timer</label>
 		</form>
-		@if (ShowComponent)
-		{
-			<form>
+			@if (ShowComponent)
+			{
+				<form>
+					<p>Show component 1</p>
+					<label for="timelimit">10 seconds</label><br>
+					<input type="radio" id="time1" name="timer" @bind="tenSecondTimer" />
 				
-			</form>
-			<p>Show component 1</p>
+					<label for="timelimit">25 seconds</label><br>
+					<input type="radio" id="time2" name="timer" @bind="twentyFiveSecondTimer" />
 
-		}
+					<label for="timelimit">40 seconds</label><br>
+					<input type="radio" id="time1" name="timer" @bind="fortySecondTimer" />
+				</form>
+			}
 		<br />
+
+		<!-- Upload Files -->
+		<InputFile OnChange="@UploadFile" multiple />
 		<button type="button" @onclick="() => ShowComponent = true">Upload</button> <button>button 2</button>
 		<input />
 		@if (ShowComponent)
@@ -51,8 +68,47 @@
 	</NotAuthorized>
 </AuthorizeView>
 
-
 @code {
+
+	private long maxFileSize = 1024 * 1024 * 3; // 3MB
+	private int maxAllowedFiles = 1;
+	private List<string> errors = new();
+
+	private async Task UploadFile(InputFileChangeEventArgs e)
+	{
+		errors.Clear();
+
+		if (e.FileCount > maxAllowedFiles)
+		{
+			errors.Add($"Error. Only {maxAllowedFiles} is allowed.");
+		}
+
+		foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+		{
+
+			try
+			{
+				string newFileName = Path.ChangeExtension(Path.GetRandomFileName(),
+				Path.GetExtension(file.Name));
+
+				string path = Path.Combine(
+					config.GetValue<string>("FileStorage")!,
+					"tcorey", newFileName);
+
+				Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!,
+				"tcorey"));
+
+				await using FileStream fileStream = new(path, FileMode.Create);
+				await file.OpenReadStream(maxFileSize).CopyToAsync(fileStream);
+			}
+			catch (Exception exception)
+			{
+				errors.Add($"File: {file.Name} Error: {exception.Message}");
+				throw;
+			}
+
+		}
+	}
 
 	bool ShowComponent { get; set; }
 	private string selectedRadio;
@@ -63,6 +119,11 @@
 	private string addedQuestion;
 	private string addedAnswer;
 
+	private int tenSecondTimer = 10;
+	private int twentyFiveSecondTimer = 25;
+	private int fortySecondTimer = 40;
+	private int noTimer = 0;
+
 	private QuestionViewModel questions = new QuestionViewModel();
 
 	private async Task AddQuestion()
@@ -72,6 +133,7 @@
 				Question = addedQuestion,
 				Answer = addedAnswer,
 				PublicId = PublicId
+
 			};
 		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 	}

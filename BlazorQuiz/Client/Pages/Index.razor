@@ -8,6 +8,12 @@
 
 <PageTitle>Index</PageTitle>
 
+<select>
+    <option value="option1">Option 1</option>
+    <option value="option2">Option 2</option>
+    <option value="option3">Option 3</option>
+</select>
+
 @{
     var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
     var user = authenticationStateTask.Result.User;
@@ -22,8 +28,6 @@
     {
             <p>@quiz.Title</p>
     }
-
-
 } else
 {
     <h1>Hello, world!</h1>
