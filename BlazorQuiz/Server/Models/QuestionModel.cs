@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlazorQuiz.Server.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,6 +20,10 @@ namespace create_a_quiz.Server.Models
         public string? Answer { get; set; }
 
         public int Timer { get; set; }
+
+        public ICollection<FakeAnswerModel> FakeAnswers { get; set; }
+
+        
 
         //public string? Media { get; set; }
 

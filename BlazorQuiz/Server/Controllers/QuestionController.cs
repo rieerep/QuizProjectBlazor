@@ -30,13 +30,22 @@ namespace BlazorQuiz.Server.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var currentQuiz = _context.Quizzes.Where(u => u.PublicId.ToString() == model.PublicId).Include(q => q.Questions).Single();
-            
+
             var question = new QuestionModel
             {
                 Question = model.Question,
                 Answer = model.Answer,
-                Timer = model.Timer
+                Timer = model.Timer,
+                FakeAnswers = new FakeAnswerModel[] {
+                    new FakeAnswerModel() { FakeAnswers = model.FakeAnswers[0]},
+                    new FakeAnswerModel() { FakeAnswers = model.FakeAnswers[1]},
+                    new FakeAnswerModel() { FakeAnswers = model.FakeAnswers[2]}
+                }
             };
+
+
+            // 
+
             currentQuiz.Questions.Add(question);
             _context.SaveChanges();
 

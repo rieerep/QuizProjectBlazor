@@ -15,5 +15,9 @@ namespace BlazorQuiz.Shared
         public string PublicId { get; set; }
 
         public int Timer {  get; set; }
+
+        public string[] FakeAnswers { get; set; }
+
+
     }
 }

@@ -25,6 +25,12 @@
 
 		<!-- Multiple Question alternative-->
 		<h4>Flervalsfråga?</h4>
+		<label for="addquestion">Fake answer 1</label>
+		<input type="text" id="question" @bind="fakeAnswers[0]" /><br />
+		<label for="addquestion">Fake answer 2</label>
+		<input type="text" id="question" @bind="fakeAnswers[1]" /><br />
+		<label for="addquestion">Fake answer 3</label>
+		<input type="text" id="question" @bind="fakeAnswers[2]" /><br />
 
 		<!-- Timed Quesitons-->
 		<p>Timed question?</p>
@@ -118,6 +124,7 @@
 	//
 	private string addedQuestion;
 	private string addedAnswer;
+	private string[] fakeAnswers = new string[3];
 
 	private int tenSecondTimer = 10;
 	private int twentyFiveSecondTimer = 25;
@@ -132,8 +139,8 @@
 			{
 				Question = addedQuestion,
 				Answer = addedAnswer,
-				PublicId = PublicId
-
+				PublicId = PublicId,
+				FakeAnswers = fakeAnswers
 			};
 		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 	}
