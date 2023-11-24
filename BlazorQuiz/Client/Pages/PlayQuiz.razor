@@ -1,0 +1,37 @@
+﻿@page "/playquiz/{publicid}/{questionindex}"
+
+@inject HttpClient Http
+@using BlazorQuiz.Shared
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+
+<h3>You're playing quiz!</h3>
+
+@foreach (var question in quizzes)
+{
+    <p>@question</p>
+}
+
+@code {
+
+    
+    [Parameter]
+    public int PublicId { get; set; }
+
+    // private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
+
+    private IEnumerable<QuestionViewModel> quizzes = new List<QuestionViewModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            quizzes = await Http.GetFromJsonAsync<List<QuestionViewModel>>("playquiz/{publicId}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+
+        }
+    }
+}

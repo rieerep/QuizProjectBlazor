@@ -1,0 +1,42 @@
+﻿@page "/choosequiz"
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@using BlazorQuiz.Shared;
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inherits QuestionViewModel
+
+<h3>PlayQuiz</h3>
+
+Choose one of all quizzes to play: 
+
+@foreach (var quiz in allQuizzes)
+{
+    <li>
+        <a href="/playquiz/@quiz.PublicId">@quiz.Title</a>
+    </li>
+}
+
+<div class="main-container">
+    <div class="quiz">
+        
+    </div>
+</div>
+
+
+@code {
+
+    private IEnumerable<QuizViewModel> allQuizzes = new List<QuizViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            allQuizzes = await Http.GetFromJsonAsync<List<QuizViewModel>>("api/quiz/allquizzes");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
+}

@@ -14,6 +14,8 @@ namespace create_a_quiz.Server.Models
 
         [ForeignKey("User")]
         public string? UserId { get; set; }
+
+        [Required(ErrorMessage = "Title is required")]
         public string? Title { get; set; }
         public virtual User? User { get; set; }
         public ICollection<QuestionModel> Questions { get; set; }

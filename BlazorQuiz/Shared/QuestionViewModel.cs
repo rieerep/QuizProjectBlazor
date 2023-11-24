@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlazorQuiz.Shared
 {
-    public class QuestionViewModel
+    public class QuestionViewModel : ComponentBase
     {
         public string Question { get; set; }
 
@@ -14,10 +15,9 @@ namespace BlazorQuiz.Shared
 
         public string PublicId { get; set; }
 
-        public int Timer {  get; set; }
+        public int TimeLimit {  get; set; }
 
         public string[] FakeAnswers { get; set; }
-
 
     }
 }

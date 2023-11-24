@@ -19,11 +19,9 @@ namespace create_a_quiz.Server.Models
 
         public string? Answer { get; set; }
 
-        public int Timer { get; set; }
+        public int TimeLimit { get; set; }
 
         public ICollection<FakeAnswerModel> FakeAnswers { get; set; }
-
-        
 
         //public string? Media { get; set; }
 

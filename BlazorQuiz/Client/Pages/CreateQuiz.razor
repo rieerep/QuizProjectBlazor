@@ -6,7 +6,6 @@
 @inject HttpClient Http
 @inject IConfiguration config
 
-
 <h3>CreateQuiz</h3>
 
 <AuthorizeView>
@@ -35,7 +34,7 @@
 			{
 				Title = inputTitle
 			};
-		var response = await Http.PostAsJsonAsync("api/quiz", newQuiz);
+		var response = await Http.PostAsJsonAsync("api/quiz/post", newQuiz);
 		if (response == null)
 		{
 			Console.WriteLine("Got null response");

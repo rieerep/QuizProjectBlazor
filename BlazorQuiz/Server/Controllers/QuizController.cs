@@ -4,6 +4,7 @@ using BlazorQuiz.Shared;
 using create_a_quiz.Server.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,9 +24,20 @@ namespace create_a_quiz.Server.Controllers
 			_userManager = userManager;
 		}
 
+
+        //GET api/playquiz
+        [HttpGet("allquizzes")]
+		public async Task<IEnumerable<QuizViewModel>> GetAllQuizzes()
+		{
+            var quizInfo = _context.Quizzes
+                .Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId })
+                .ToList();
+
+            return quizInfo;
+		}
+
 		//GET api/get
 		[HttpGet("get")]
-
 		public async Task<IEnumerable<QuizViewModel>> Get()
 		{
 
@@ -35,15 +47,45 @@ namespace create_a_quiz.Server.Controllers
 				throw new ArgumentNullException("userId");
 			}
 
-			var quizInfo = _context.Quizzes.Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId}).ToList();
+			var quizInfo = _context.Quizzes
+				.Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId})
+				.ToList();
 
-			var userQuizzes = _context.Quizzes.Where(u => u.UserId == userId).Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId}).ToList();
+			var userQuizzes = _context.Quizzes
+				.Where(u => u.UserId == userId)
+				.Select(q => new QuizViewModel { Title = q.Title, PublicId = q.PublicId})
+				.ToList();
 
 			return userQuizzes;
 		}
 
+		[HttpGet("chosenquiz/{publicId}")]
+		public async Task<QuizModel> ChosenQuiz(Guid publicId, int questionIndex)
+		{
+			// konverta från question model till question view model
+			var quizInfo = _context.Quizzes.Where(q => q.PublicId == publicId)
+				.Include(q => q.Questions).ThenInclude(f => f.FakeAnswers )
+				.FirstOrDefault()
+				.Questions.Select(q => new QuestionViewModel { 
+					Question = q.Question, 
+					FakeAnswers = q.FakeAnswers.Select(f => f.FakeAnswer).ToArray(), 
+					Answer = q.Answer, 
+					TimeLimit = q.TimeLimit
+				});
+
+			return quizInfo;
+
+			// Skapa en lista med Answer och fakeanswer tillsammans.
+			// Skicka in en lista som består av alla frågor som quizzet hr
+
+
+			// Select all questions where quizID = question.quizID
+		
+		}
+
+
 		// POST api/<CreateQuizController>
-		[HttpPost]
+		[HttpPost("post")]
 		public IActionResult Post([FromBody] QuizViewModel model)
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

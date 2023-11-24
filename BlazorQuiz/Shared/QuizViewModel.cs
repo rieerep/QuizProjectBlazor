@@ -11,5 +11,6 @@ namespace BlazorQuiz.Shared
 		public Guid PublicId { get; set; }
 		public string? Title { get; set; }
 
+		//public List<QuestionViewModel> Question { get; set; }
 	}
 }
