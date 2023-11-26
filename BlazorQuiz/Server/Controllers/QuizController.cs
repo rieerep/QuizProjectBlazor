@@ -73,7 +73,7 @@ namespace create_a_quiz.Server.Controllers
 					TimeLimit = q.TimeLimit
 				});
 
-			return quizInfo;
+			return null;
 
 			// Skapa en lista med Answer och fakeanswer tillsammans.
 			// Skicka in en lista som består av alla frågor som quizzet hr

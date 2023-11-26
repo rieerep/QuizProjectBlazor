@@ -1,0 +1,19 @@
+﻿@inherits PlayQuiz
+
+<h3>CurrentPlayQuizQuestion</h3>
+
+<div class="QuestionTitle">
+	<!---->
+</div>
+
+<div class="quiz-body">
+	@foreach (var option in Questions)
+	{
+		<p>@option.Options[0]</p>
+	}
+</div>
+
+@code {
+
+
+}
