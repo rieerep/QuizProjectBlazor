@@ -60,20 +60,38 @@ namespace create_a_quiz.Server.Controllers
 		}
 
 		[HttpGet("chosenquiz/{publicId}")]
-		public async Task<QuizModel> ChosenQuiz(Guid publicId, int questionIndex)
+		public async Task<List<QuestionViewModel>> ChosenQuiz(Guid publicId)
 		{
 			// konverta från question model till question view model
 			var quizInfo = _context.Quizzes.Where(q => q.PublicId == publicId)
-				.Include(q => q.Questions).ThenInclude(f => f.FakeAnswers )
+				.Include(q => q.Questions).ThenInclude(f => f.FakeAnswers)
 				.FirstOrDefault()
-				.Questions.Select(q => new QuestionViewModel { 
-					Question = q.Question, 
-					FakeAnswers = q.FakeAnswers.Select(f => f.FakeAnswer).ToArray(), 
-					Answer = q.Answer, 
-					TimeLimit = q.TimeLimit
-				});
+			.Questions.Select(q => new QuestionViewModel
+			 {
+				 Question = q.Question,
+				 FakeAnswers = q.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
+				 Answer = q.Answer,
+				 TimeLimit = q.TimeLimit
+			 }).ToList();
 
-			return null;
+			// Check if the quiz exists
+			if (quizInfo == null)
+			{
+				throw new Exception("Quiz not found");
+			}
+
+			// var question = quizInfo.Questions.First();
+
+			//var questionViewModel = new QuestionViewModel
+			//{
+			//	Question = question.Question,
+			//	FakeAnswers = question.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
+			//	Answer = question.Answer,
+			//	TimeLimit = question.TimeLimit
+
+			//};
+
+			return quizInfo;
 
 			// Skapa en lista med Answer och fakeanswer tillsammans.
 			// Skicka in en lista som består av alla frågor som quizzet hr

@@ -1,4 +1,4 @@
-﻿@page "/playquiz/{publicid}/{questionindex}"
+﻿@page "/playquiz/{publicid}"
 
 @inject HttpClient Http
 @using BlazorQuiz.Server.Models
@@ -6,57 +6,83 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @using Microsoft.AspNetCore.Components
 
-<h3>You're playing quiz!</h3>
+<h3>Todo: Get quiz title of chosen quiz</h3>
 
 
-@foreach (var question in quizzes)
-{
-	<p>@question</p>
-}
+<div class="quiz-container">
+    @foreach (var question in quizzes)
+    {
+        <h4>Fråga: @question.Question</h4>
+        <li>
+        <label>@question.Answer</label>
+        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = question.Answer)">
+        </li>
+        @foreach (var fakeAnswer in question.FakeAnswers)
+        {
+            <li>
+                <label>@fakeAnswer</label>
+                <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
+            </li>
+        }
+        <p>Time limit: @question.TimeLimit</p>
+
+    }
+
+</div>
 
 @code {
 
-	public List<Question> Questions { get; set; } = new List<Question>();
-	protected int questionindex = 0;
-	protected int score = 0;
+    string selectedAnswer;
+    int score = 0;
 
-	[Parameter]
-	public int PublicId { get; set; }
+    // public List<Question> Questions { get; set; } = new List<Question>();
 
-	// private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
+    [Parameter]
+    public int questionindex { get; set; }
 
-	private IEnumerable<QuestionViewModel> quizzes = new List<QuestionViewModel>();
+    [Parameter]
+    public string? PublicId { get; set; }
+
+    // private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
+
+    private List<QuestionViewModel> quizzes = new List<QuestionViewModel>();
 
 
-	protected override async Task OnInitializedAsync()
-	{
-		try
-		{
-			quizzes = await Http.GetFromJsonAsync<List<QuestionViewModel>>("playquiz/{publicId}");
-		}
-		catch (AccessTokenNotAvailableException exception)
-		{
-			exception.Redirect();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            quizzes = await Http.GetFromJsonAsync<List<QuestionViewModel>>($"api/quiz/chosenquiz/{PublicId}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
 
-		}
-	}
+        }
+    }
 
-	private void LoadQuestions()
-	{
-		Question questionOne = new Question
-			{
-				QuestionTitle = "Question One",
-				Answer = "Option 1",
-				Options = new List<string>() { "Option 1", "Option 2", "option 3" }
+    private async Task CheckAnswer()
+    {
+        var response = await Http.PostAsJsonAsync("api/quiz", selectedAnswer);
+        var result = await response.Content.ReadAsStringAsync();
+    }
 
-			};
-		Question questionTwo = new Question
-			{
-				QuestionTitle = "Question Two",
-				Answer = "Option 2",
-				Options = new List<string>() { "Option 1", "Option 2" }
-			};
+    private void LoadQuestions()
+    {
+        Question questionOne = new Question
+            {
+                QuestionTitle = "Question One",
+                Answer = "Option 1",
+                Options = new List<string>() { "Option 1", "Option 2", "option 3" }
 
-	}
+            };
+        Question questionTwo = new Question
+            {
+                QuestionTitle = "Question Two",
+                Answer = "Option 2",
+                Options = new List<string>() { "Option 1", "Option 2" }
+            };
+
+    }
 
 }
