@@ -121,5 +121,14 @@ namespace create_a_quiz.Server.Controllers
 			QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
 			return Ok(newQuizId);
 		}
+
+
+		//POST /api/quiz/checkanswer
+		[HttpPost]
+
+		public	IActionResult Post()
+		{
+			return null;
+		}
 	}
 }

@@ -23,6 +23,13 @@ namespace BlazorQuiz.Server.Controllers
             _userManager = userManager;
         }
 
+        [HttpPost]
+
+        //public IActionResult Post([FromBody] QuestionViewModel model)
+        //{
+        //    var currentQuestion = _context.Questions.Where(q => q.Id == model.id)
+        //}
+
         //POST api/<CreateQuestionController>
         [HttpPost]
         public IActionResult Post([FromBody] QuestionViewModel model)

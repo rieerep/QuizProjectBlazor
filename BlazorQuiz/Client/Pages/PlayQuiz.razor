@@ -1,44 +1,64 @@
 ﻿@page "/playquiz/{publicid}"
 
 @inject HttpClient Http
-@using BlazorQuiz.Server.Models
+
 @using BlazorQuiz.Shared
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @using Microsoft.AspNetCore.Components
 
 <h3>Todo: Get quiz title of chosen quiz</h3>
 
+<div class="quiz-container">
+
+
+<h4>@quizzes[questionIndex].Question</h4>
+    <li>
+<label>@quizzes[questionIndex].Answer</label>
+    <input type="radio" name="userChoice">
+    </li>
+@foreach (var fakeAnswer in quizzes[questionIndex].FakeAnswers)
+{
+    <li>
+        <label>@fakeAnswer</label>
+        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
+    </li>
+}
+    <input type="button" value="Submit" @onclick="() => CheckAnswer(quizzes[questionIndex].Answer, selectedAnswer )">Submit answer</input>
+
+@*      <input type="button" value="Submit" @onclick=CheckAnswer(quizzes[questionIndex].Answer,  ) >Submit answer</input>
+ *@</div>
+
 
 <div class="quiz-container">
-    @foreach (var question in quizzes)
+@*     @foreach (var question in quizzes)
     {
-        <h4>Fråga: @question.Question</h4>
-        <li>
+        <h4>Fråga: @question.Question[questionindex]</h4>
+    <li>
         <label>@question.Answer</label>
         <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = question.Answer)">
         </li>
         @foreach (var fakeAnswer in question.FakeAnswers)
         {
             <li>
-                <label>@fakeAnswer</label>
+                <label>@fakeAnswer[questionindex]</label>
                 <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
             </li>
         }
         <p>Time limit: @question.TimeLimit</p>
-
     }
-
+ *@
 </div>
 
 @code {
 
-    string selectedAnswer;
+    string? selectedAnswer;
     int score = 0;
+    int questionIndex = 0;
 
     // public List<Question> Questions { get; set; } = new List<Question>();
 
-    [Parameter]
-    public int questionindex { get; set; }
+    // [Parameter]
+    // public int questionindex { get; set; } = 0;
 
     [Parameter]
     public string? PublicId { get; set; }
@@ -61,27 +81,18 @@
         }
     }
 
-    private async Task CheckAnswer()
+    private async Task CheckAnswer(string guess, string answer)
     {
-        var response = await Http.PostAsJsonAsync("api/quiz", selectedAnswer);
-        var result = await response.Content.ReadAsStringAsync();
+        // var response = await Http.PostAsJsonAsync("api/quiz", selectedAnswer);
+        // var result = await response.Content.ReadAsStringAsync();
+
+        if (guess == answer)
+        {
+            score++;
+        }
+
+        questionIndex++;
     }
-
-    private void LoadQuestions()
-    {
-        Question questionOne = new Question
-            {
-                QuestionTitle = "Question One",
-                Answer = "Option 1",
-                Options = new List<string>() { "Option 1", "Option 2", "option 3" }
-
-            };
-        Question questionTwo = new Question
-            {
-                QuestionTitle = "Question Two",
-                Answer = "Option 2",
-                Options = new List<string>() { "Option 1", "Option 2" }
-            };
 
     }
 
