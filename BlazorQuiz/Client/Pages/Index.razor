@@ -6,13 +6,6 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudGrid>
-    <MudItem >
-        <MudAutocomplete T="string" Label="Search for a quiz"></MudAutocomplete>
-    </MudItem>
-</MudGrid>
-
-
 @{
     var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
     var user = authenticationStateTask.Result.User;
@@ -23,16 +16,9 @@
 {
     <h1>Welcome, @user.Identity.Name</h1>
 
-
-
- @*    for (int i = 0; i < quizzes.Count(); i++)
-    {
-        var mudindex = i;
-        
-    } *@
-
      <div class="quiz-list-container">
     <h3>List of your quizzes:</h3>
+
     @foreach (var quiz in quizzes)
     {
             <p>@quiz.Title</p>  

@@ -6,156 +6,154 @@
 @using BlazorQuiz.Shared
 @using static System.Net.WebRequestMethods;
 
+<div class="quiz-container">
 
-<h4></h4>
-<h3>Add questions to your quiz</h3>
+    <h3>Add questions to your quiz</h3>
 
-<AuthorizeView>
-	<Authorized>
+    <AuthorizeView>
+        <Authorized>
 
-		<!--Add question-->
+            <!--Add question-->
 
-		<form name="questionform">
-			<label for="addquestion">Question</label><br />
-			<input type="text" id="question" @bind="addedQuestion" /><br />
-			<label for="addquestion" id="question">Answer</label><br />
-			<input type="text" id="answer" @bind=addedAnswer />
-			<input type="button" value="Submit" @onclick=AddQuestion>Add question</input>
-			<br />
+            <form name="questionform">
+                <label for="addquestion">Question</label><br />
+                <input type="text" id="question" @bind="addedQuestion" /><br />
+                <label for="addquestion" id="question">Answer</label><br />
+                <input type="text" id="answer" @bind=addedAnswer />
 
-		<!-- Multiple Question alternative-->
-		<h4>Flervalsfråga?</h4>
-		<label for="addquestion">Fake answer 1</label>
-		<input type="text" id="question" @bind="fakeAnswers[0]" /><br />
-		<label for="addquestion">Fake answer 2</label>
-		<input type="text" id="question" @bind="fakeAnswers[1]" /><br />
-		<label for="addquestion">Fake answer 3</label>
-		<input type="text" id="question" @bind="fakeAnswers[2]" /><br />
+                <br />
 
-		<!-- Timed Quesitons-->
+                <!-- Multiple Question alternative-->
+                <h4>Flervalsfråga?</h4>
+                <label for="addquestion">Fake answer 1</label>
+                <input type="text" id="question" @bind="fakeAnswers[0]" /><br />
+                <label for="addquestion">Fake answer 2</label>
+                <input type="text" id="question" @bind="fakeAnswers[1]" /><br />
+                <label for="addquestion">Fake answer 3</label>
+                <input type="text" id="question" @bind="fakeAnswers[2]" /><br />
 
-			<input type="radio" id="notimer" name="timerchoice" value="0" />
-			<label @onclick="() => ShowComponent = false" name="No timer" >No timer</label>
-			<input type="radio" id="timer" name="timerchoice" value="2" />
-			<label @onclick="() => ShowComponent = true">Timer</label>
-		</form>
-			@if (ShowComponent)
-			{
-			<MudRadioGroup Class="mt-2" @bind-SelectedOption=timeLimit>
-				<MudRadio Option="10" Color="Color.Primary">10 seconds</MudRadio>
-				<MudRadio Option="25" Color="Color.Primary">25 seconds</MudRadio>
-				<MudRadio Option="50" Color="Color.Primary">50 seconds</MudRadio>
-			</MudRadioGroup>
+                <!-- Timed Quesitons-->
 
-				@* <form>
-					<p>Show component 1</p>
-					<label for="timelimit">10 seconds</label><br>
-					<input type="radio" id="time1" name="timer" @bind="timeLimit" />
-				
-					<label for="timelimit">25 seconds</label><br>
-					<input type="radio" id="time2" name="timer" @bind="timeLimit" />
+                <input type="radio" id="notimer" name="timerchoice" value="0" />
+                <label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
+                <input type="radio" id="timer" name="timerchoice" value="2" />
+                <label @onclick="() => ShowComponent = true">Timer</label>
+            </form>
+            @if (ShowComponent)
+            {
+                <MudRadioGroup Class="mt-2" @bind-SelectedOption=timeLimit>
+                    <MudRadio Option="10" Color="Color.Primary">10 seconds</MudRadio>
+                    <MudRadio Option="25" Color="Color.Primary">25 seconds</MudRadio>
+                    <MudRadio Option="50" Color="Color.Primary">50 seconds</MudRadio>
+                </MudRadioGroup>
 
-					<label for="timelimit">40 seconds</label><br>
-				<input type="radio" id="time1" name="timer" @bind="timeLimit" />
-				</form> *@
-			}
-		<br />
+            }
+            <br />
 
-		<!-- Upload Files -->
-		<InputFile OnChange="@UploadFile" multiple />
-		
-		<MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/">Finish the quiz!</MudButton>
+            <!-- Upload Files or Add URL -->
+            <label for="addedURL">Add URL for a picture</label>
+            <input type="text" id="question" @bind="addedURL" />
+            <InputFile OnChange="@UploadFile" />
+            <br />
+            <input type="button" value="Add Question" @onclick=AddQuestion>Add question</input>
+            <br />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/">Finish the quiz!</MudButton>
 
+        </Authorized>
 
-	</Authorized>
-	<NotAuthorized>
-		<p>Du måste logga in för att skapa ett quiz.</p>
-	</NotAuthorized>
-</AuthorizeView>
+        <NotAuthorized>
+            <p>Du måste logga in för att skapa ett quiz.</p>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
 
 @code {
 
-	private long maxFileSize = 1024 * 1024 * 3; // 3MB
-	private int maxAllowedFiles = 1;
-	private List<string> errors = new();
+    private long maxFileSize = 1024 * 1024 * 3; // 3MB
+    private int maxAllowedFiles = 1;
+    private List<string> errors = new();
+
+    private IBrowserFile file;
+    private string uploadMessage;
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+    }
+
+    private async Task UploadFile(InputFileChangeEventArgs e)
+    {
+        errors.Clear();
+
+        if (e.FileCount > maxAllowedFiles)
+        {
+            errors.Add($"Error. Only {maxAllowedFiles} is allowed.");
+        }
+
+        try
+        {
+            string newFileName = Path.ChangeExtension(Path.GetRandomFileName(),
+            Path.GetExtension(file.Name));
+
+            string path = Path.Combine(
+                config.GetValue<string>("FileStorage")!,
+                "tcorey", newFileName);
+
+            Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!,
+            "tcorey"));
+
+            await using FileStream fileStream = new(path, FileMode.Create);
+            await file.OpenReadStream(maxFileSize).CopyToAsync(fileStream);
+        }
+        catch (Exception exception)
+        {
+            errors.Add($"File: {file.Name} Error: {exception.Message}");
+            throw;
+        }
 
 
-	// Metod add fake answer
+    }
 
+    bool ShowComponent { get; set; }
+    private string selectedRadio;
 
-	private async Task UploadFile(InputFileChangeEventArgs e)
-	{
-		errors.Clear();
+    [Parameter]
+    public string PublicId { get; set; }
 
-		if (e.FileCount > maxAllowedFiles)
-		{
-			errors.Add($"Error. Only {maxAllowedFiles} is allowed.");
-		}
+    private string addedQuestion = "";
+    private string addedAnswer = "";
+    private string addedURL = "";
+    private string[] fakeAnswers = new string[3];
+    private bool hasMultipleAnswers = false;
 
-		foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
-		{
+    private int timeLimit = 0;
 
-			try
-			{
-				string newFileName = Path.ChangeExtension(Path.GetRandomFileName(),
-				Path.GetExtension(file.Name));
+    private QuestionViewModel questions = new QuestionViewModel();
 
-				string path = Path.Combine(
-					config.GetValue<string>("FileStorage")!,
-					"tcorey", newFileName);
+    private async Task AddQuestion()
+    {
+        QuestionViewModel newQuestion = new QuestionViewModel()
+            {
+                Question = addedQuestion,
+                Answer = addedAnswer,
+                PublicId = PublicId,
+                TimeLimit = timeLimit,
+                FakeAnswers = fakeAnswers
+            };
+        var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 
-				Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!,
-				"tcorey"));
+        addedQuestion = "";
+        addedAnswer = "";
+        addedURL = "";
 
-				await using FileStream fileStream = new(path, FileMode.Create);
-				await file.OpenReadStream(maxFileSize).CopyToAsync(fileStream);
-			}
-			catch (Exception exception)
-			{
-				errors.Add($"File: {file.Name} Error: {exception.Message}");
-				throw;
-			}
+        for (int i = 0; i < fakeAnswers.Length; i++)
+        {
+            fakeAnswers[i] = "";
+        }
+        timeLimit = 0;
 
-		}
-	}
+    }
 
-	bool ShowComponent { get; set; }
-	private string selectedRadio;
-
-	[Parameter]
-	public string PublicId { get; set; }
-	//
-	private string addedQuestion = "";
-	private string addedAnswer = "";
-	private string[] fakeAnswers = new string[3];
-	private bool hasMultipleAnswers = false;
-
-	private int timeLimit = 0;
-
-	private QuestionViewModel questions = new QuestionViewModel();
-
-	private async Task AddQuestion()
-	{
-		QuestionViewModel newQuestion = new QuestionViewModel()
-			{
-				Question = addedQuestion,
-				Answer = addedAnswer,
-				PublicId = PublicId,
-				TimeLimit = timeLimit,
-				FakeAnswers = fakeAnswers
-			};
-		var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
-
-		addedQuestion = "";
-		addedAnswer = "";
-
-		for (int i = 0; i < fakeAnswers.Length; i++)
-		{
-			fakeAnswers[i] = "";
-		}
-		timeLimit = 0;
-
-	}
-
-	//Lägg i question, answer och publicid i Questioncontrollern
+    //Lägg i question, answer och publicid i Questioncontrollern
 }

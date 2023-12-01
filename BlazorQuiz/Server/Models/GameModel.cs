@@ -6,6 +6,9 @@ namespace BlazorQuiz.Server.Models
 {
     public class GameModel
     {
+        [Key]
+        public int Id { get; set; }
+
         [ForeignKey("Quiz")]
         public int QuizId { get; set; }
 
@@ -16,10 +19,8 @@ namespace BlazorQuiz.Server.Models
 
         public virtual User? Player { get; set; }
 
-
         [Required]
         public int Score { get; set; }
-
 
     }
 }

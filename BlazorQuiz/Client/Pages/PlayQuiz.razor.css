@@ -41,6 +41,12 @@
     font-weight: bold;
 }
 
+#timelimit-font {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.9em;
+    color: darkred
+}
+
 @media (max-width: 600px) {
     .quiz-container {
         padding: 10px;

@@ -1,4 +1,4 @@
-﻿@page "/playquiz/{publicid}"
+﻿@page "/playquiz/{PublicId:guid}"
 
 @inject HttpClient Http
 
@@ -8,52 +8,52 @@
 
 <h3>Todo: Get quiz title of chosen quiz</h3>
 
-<div class="quiz-container">
-
-
-<h4>@quizzes[questionIndex].Question</h4>
-    <li>
-<label>@quizzes[questionIndex].Answer</label>
-    <input type="radio" name="userChoice">
-    </li>
-@foreach (var fakeAnswer in quizzes[questionIndex].FakeAnswers)
-{
-    <li>
-        <label>@fakeAnswer</label>
-        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
-    </li>
-}
-    <input type="button" value="Submit" @onclick="() => CheckAnswer(quizzes[questionIndex].Answer, selectedAnswer )">Submit answer</input>
-
-@*      <input type="button" value="Submit" @onclick=CheckAnswer(quizzes[questionIndex].Answer,  ) >Submit answer</input>
- *@</div>
-
 
 <div class="quiz-container">
-@*     @foreach (var question in quizzes)
+
+    @if (questions[questionIndex].TimeLimit > 0)
     {
-        <h4>Fråga: @question.Question[questionindex]</h4>
-    <li>
-        <label>@question.Answer</label>
-        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = question.Answer)">
-        </li>
-        @foreach (var fakeAnswer in question.FakeAnswers)
-        {
-            <li>
-                <label>@fakeAnswer[questionindex]</label>
-                <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
-            </li>
-        }
-        <p>Time limit: @question.TimeLimit</p>
+        <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
     }
- *@
+
+    <h4>@questions[questionIndex].Question</h4>
+    <li>
+        <label>@questions[questionIndex].Answer</label>
+        <input type="radio" name="userChoice">
+    </li>
+    @foreach (var fakeAnswer in questions[questionIndex].FakeAnswers)
+    {
+        <li>
+            <label>@fakeAnswer</label>
+            <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
+        </li>
+    }
+
+    @if (questions[questionIndex].TimeLimit > 0)
+    {
+        <p>You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
+    }
+    @questionIndex
+    <p>@score</p>
+    <p id>questions count: @questions.Count()</p>
+    <input type="button" value="Submit" @onclick="() => CheckAnswer(questions[questionIndex].Answer, selectedAnswer )">Submit answer</input>
+
+    @*      <input type="button" value="Submit" @onclick=CheckAnswer(quizzes[questionIndex].Answer,  ) >Submit answer</input>
+    *@
 </div>
 
 @code {
+    private int starterTime = 0;
 
+    private System.Timers.Timer timer;
+
+
+    // timer.elapsed (visa hur lång tid har gått)
+    // jämföra timer-klassen med int timelimit
     string? selectedAnswer;
     int score = 0;
     int questionIndex = 0;
+    bool gameOver = false;
 
     // public List<Question> Questions { get; set; } = new List<Question>();
 
@@ -61,23 +61,22 @@
     // public int questionindex { get; set; } = 0;
 
     [Parameter]
-    public string? PublicId { get; set; }
+    public Guid? PublicId { get; set; }
 
     // private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
-    private List<QuestionViewModel> quizzes = new List<QuestionViewModel>();
+    private List<QuestionViewModel> questions = new List<QuestionViewModel>();
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            quizzes = await Http.GetFromJsonAsync<List<QuestionViewModel>>($"api/quiz/chosenquiz/{PublicId}");
+            questions = await Http.GetFromJsonAsync<List<QuestionViewModel>>($"api/quiz/chosenquiz/{PublicId}");
         }
         catch (AccessTokenNotAvailableException exception)
         {
             exception.Redirect();
-
         }
     }
 
@@ -91,9 +90,28 @@
             score++;
         }
 
-        questionIndex++;
-    }
+        if (questionIndex >= questions.Count() - 1)
+        {
+
+            gameOver = true;
+            await EndGame();
+        }
+        else
+        {
+            questionIndex++;
+        }
 
     }
 
+    private async Task EndGame()
+    {
+
+        EndgameViewModel endgameModel = new EndgameViewModel()
+            {
+
+                PublicId = PublicId,
+                Score = score
+            };
+        await Http.PostAsJsonAsync("api/game/endgame", endgameModel /* new { PublicId = PublicId , score = score } */);
+    }
 }
