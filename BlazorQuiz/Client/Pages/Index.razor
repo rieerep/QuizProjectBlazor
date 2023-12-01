@@ -1,6 +1,9 @@
 ﻿@page "/"
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
+<style>
+@@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+</style>
 @using BlazorQuiz.Shared
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
@@ -11,10 +14,10 @@
     var user = authenticationStateTask.Result.User;
 }
 
-
+<div class="body">
 @if (user.Identity?.IsAuthenticated ?? false)
 {
-    <h1>Welcome, @user.Identity.Name</h1>
+    <h3>Welcome, @user.Identity.Name</h3>
 
      <div class="quiz-list-container">
     <h3>List of your quizzes:</h3>
@@ -28,6 +31,7 @@
 {
     <h1>Hello, world!</h1>
 }
+</div>
 
 
 @code {

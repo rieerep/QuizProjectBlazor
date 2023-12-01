@@ -19,5 +19,9 @@ namespace BlazorQuiz.Shared
 
         public string[] FakeAnswers { get; set; }
 
+        public string MediaURL { get; set; }
+
+        public bool HasMultipleAnswers { get; set; }
+
     }
 }

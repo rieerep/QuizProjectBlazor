@@ -23,6 +23,8 @@ namespace create_a_quiz.Server.Models
 
         public string MediaURL { get; set; }
 
+        public bool HasMultipleAnswers { get; set; }
+
         public ICollection<FakeAnswerModel> FakeAnswers { get; set; }
 
         //public string? Media { get; set; }

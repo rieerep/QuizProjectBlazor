@@ -47,7 +47,10 @@ namespace BlazorQuiz.Server.Controllers
                     new FakeAnswerModel() { FakeAnswer = model.FakeAnswers[0]},
                     new FakeAnswerModel() { FakeAnswer = model.FakeAnswers[1]},
                     new FakeAnswerModel() { FakeAnswer = model.FakeAnswers[2]}
-                }
+                },
+                MediaURL = model.MediaURL,
+                HasMultipleAnswers = model.HasMultipleAnswers
+
             };
 
             currentQuiz.Questions.Add(question);

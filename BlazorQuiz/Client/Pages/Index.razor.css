@@ -10,3 +10,16 @@
 p {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
+
+.main {
+
+    background-color: goldenrod;
+
+}
+
+h3 {
+    font-family: Gadugi;
+    display: flex;
+    justify-content: center;
+    padding: 1em
+}

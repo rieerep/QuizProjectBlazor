@@ -6,54 +6,80 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @using Microsoft.AspNetCore.Components
 
-<h3>Todo: Get quiz title of chosen quiz</h3>
 
-
-<div class="quiz-container">
-
-    @if (questions[questionIndex].TimeLimit > 0)
+@if (gameOver == false)
+{
+    @if (questions.Count() > 0)
     {
-        <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
-    }
+        <h3>Todo: Get quiz title of chosen quiz</h3>
 
-    <h4>@questions[questionIndex].Question</h4>
-    <li>
-        <label>@questions[questionIndex].Answer</label>
-        <input type="radio" name="userChoice">
-    </li>
-    @foreach (var fakeAnswer in questions[questionIndex].FakeAnswers)
-    {
-        <li>
-            <label>@fakeAnswer</label>
-            <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = fakeAnswer)">
-        </li>
-    }
+        <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer, selectedAnswer )">
+            <img src="@questions[questionIndex].MediaURL" width="300" height="400" />
+            @if (questions[questionIndex].TimeLimit > 0)
+            {
+                <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
+            }
 
-    @if (questions[questionIndex].TimeLimit > 0)
-    {
-        <p>You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
-    }
-    @questionIndex
-    <p>@score</p>
-    <p id>questions count: @questions.Count()</p>
-    <input type="button" value="Submit" @onclick="() => CheckAnswer(questions[questionIndex].Answer, selectedAnswer )">Submit answer</input>
+            <img src="" />
+            <h4>@questions[questionIndex].Question</h4>
+            @* <li>
+    <label>@questions[questionIndex].Answer</label>
+    <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = questions[questionIndex].Answer)">
+    </li> *@
 
-    @*      <input type="button" value="Submit" @onclick=CheckAnswer(quizzes[questionIndex].Answer,  ) >Submit answer</input>
-    *@
-</div>
+            @if (questions[questionIndex].HasMultipleAnswers == true)
+            {
+                @foreach (var option in options)
+                {
+                    <li>
+                        @*   <label>@option</label>
+        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
+        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
+        *@                    <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
+
+                    </li>
+                }
+
+            } else
+            {
+            <input type="text">
+            }
+
+            <p>Your answer: @selectedAnswer</p>
+            @questionIndex
+
+            @if (isCorrectAnswer == true)
+            {
+            <p>Correct</p>
+            }
+
+            @if (isWrongAnswer == true)
+            {
+            <p>Wrong</p>
+            }
+
+            <p>@score</p>
+            <p id>questions count: @questions.Count()</p>
+            <button type="submit">Submit answer </button>
+        </EditForm>
+    }
+} else
+{
+    <p>Game Over</p>
+}
+
+
 
 @code {
-    private int starterTime = 0;
 
-    private System.Timers.Timer timer;
-
-
-    // timer.elapsed (visa hur lång tid har gått)
-    // jämföra timer-klassen med int timelimit
+    DateTime startTime = DateTime.Now;
     string? selectedAnswer;
     int score = 0;
     int questionIndex = 0;
     bool gameOver = false;
+    bool isDisabled = false;
+    bool isCorrectAnswer = false;
+    bool isWrongAnswer = false;
 
     // public List<Question> Questions { get; set; } = new List<Question>();
 
@@ -67,6 +93,36 @@
 
     private List<QuestionViewModel> questions = new List<QuestionViewModel>();
 
+    private List<string> options = new List<string>();
+
+    private void Click(string answer)
+    {
+        if (answer == questions[questionIndex].Answer)
+        {
+            isCorrectAnswer = true;
+        }
+        else
+        {
+            isWrongAnswer = true;
+        }
+        selectedAnswer = answer;
+        isDisabled = true;
+    }
+
+    private void TextAnswer(string answer)
+    {
+        if (answer.ToLower().Trim() == questions[questionIndex].Answer.ToLower().Trim())
+        {
+            isCorrectAnswer = true;
+        }
+        else
+        {
+            isWrongAnswer = true;
+        }
+        selectedAnswer = answer;
+        isDisabled = true;
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,29 +134,79 @@
         {
             exception.Redirect();
         }
+        if (questions != null)
+        {
+            options.Clear();
+            foreach (var fakeAnswer in questions[questionIndex].FakeAnswers)
+            {
+                options.Add(fakeAnswer);
+            }
+            options.Add(questions[questionIndex].Answer);
+            Shuffle(options);
+
+        }
+    }
+
+    private Random rng = new Random();
+    public void Shuffle<T>(List<T> list)
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
     }
 
     private async Task CheckAnswer(string guess, string answer)
     {
+        isDisabled = false;
+        DateTime endTime = DateTime.Now;
+
+        Console.WriteLine("Endtime: " + endTime);
+        Console.WriteLine("Startime" + startTime);
         // var response = await Http.PostAsJsonAsync("api/quiz", selectedAnswer);
         // var result = await response.Content.ReadAsStringAsync();
 
-        if (guess == answer)
+        TimeSpan elapsedTime = endTime - startTime;
+        int secondsElapsed = (int)elapsedTime.TotalSeconds;
+
+        if (secondsElapsed > questions[questionIndex].TimeLimit)
         {
+            Thread.Sleep(3000);
+        }
+        if (guess == answer && secondsElapsed < questions[questionIndex].TimeLimit)
+        {
+            Console.WriteLine("Score: " + score);
             score++;
         }
 
         if (questionIndex >= questions.Count() - 1)
         {
-
             gameOver = true;
             await EndGame();
         }
         else
         {
+            isCorrectAnswer = false;
+            isWrongAnswer = false;
             questionIndex++;
-        }
+            if (questions != null)
+            {
+                options.Clear();
+                foreach (var fakeAnswer in questions[questionIndex].FakeAnswers)
+                {
+                    options.Add(fakeAnswer);
+                }
+                options.Add(questions[questionIndex].Answer);
+                Shuffle(options);
 
+            }
+        }
+        startTime = DateTime.Now;
     }
 
     private async Task EndGame()
@@ -108,7 +214,6 @@
 
         EndgameViewModel endgameModel = new EndgameViewModel()
             {
-
                 PublicId = PublicId,
                 Score = score
             };

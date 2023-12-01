@@ -16,21 +16,36 @@
             <!--Add question-->
 
             <form name="questionform">
+                <div class="form-group">
                 <label for="addquestion">Question</label><br />
-                <input type="text" id="question" @bind="addedQuestion" /><br />
+                <input type="text" id="question" class="form-control" @bind="addedQuestion" /><br />
                 <label for="addquestion" id="question">Answer</label><br />
                 <input type="text" id="answer" @bind=addedAnswer />
-
+                </div>
                 <br />
 
                 <!-- Multiple Question alternative-->
-                <h4>Flervalsfråga?</h4>
-                <label for="addquestion">Fake answer 1</label>
-                <input type="text" id="question" @bind="fakeAnswers[0]" /><br />
-                <label for="addquestion">Fake answer 2</label>
-                <input type="text" id="question" @bind="fakeAnswers[1]" /><br />
-                <label for="addquestion">Fake answer 3</label>
-                <input type="text" id="question" @bind="fakeAnswers[2]" /><br />
+
+                <label for="multi">Multi</label>
+                <input type="checkbox" id="multi" value="Flervalsfråga" @bind="multipleAnswer" />
+
+                @if (multipleAnswer == true) {
+
+                    <label for="addquestion">Fake answer 1</label>
+                    <input type="text" id="question" @bind="fakeAnswers[0]" />
+
+                    <br />
+                    <label for="addquestion">Fake answer 2</label>
+                    <input type="text" id="question" @bind="fakeAnswers[1]" />
+
+                    <br />
+                    <label for="addquestion">Fake answer 3</label>
+                    <input type="text" id="question" @bind="fakeAnswers[2]" />
+
+                    <br />
+
+                }
+                
 
                 <!-- Timed Quesitons-->
 
@@ -53,11 +68,11 @@
             <!-- Upload Files or Add URL -->
             <label for="addedURL">Add URL for a picture</label>
             <input type="text" id="question" @bind="addedURL" />
-            <InputFile OnChange="@UploadFile" />
+            @* <InputFile OnChange="@UploadFile" /> *@
             <br />
-            <input type="button" value="Add Question" @onclick=AddQuestion>Add question</input>
+            <input type="button" value="Add Question" class="btn btn-primary" @onclick=AddQuestion>Add question</input>
+
             <br />
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/">Finish the quiz!</MudButton>
 
         </Authorized>
 
@@ -65,7 +80,9 @@
             <p>Du måste logga in för att skapa ett quiz.</p>
         </NotAuthorized>
     </AuthorizeView>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/">Finish the quiz!</MudButton>
 </div>
+
 
 
 @code {
@@ -82,40 +99,8 @@
         file = e.File;
     }
 
-    private async Task UploadFile(InputFileChangeEventArgs e)
-    {
-        errors.Clear();
-
-        if (e.FileCount > maxAllowedFiles)
-        {
-            errors.Add($"Error. Only {maxAllowedFiles} is allowed.");
-        }
-
-        try
-        {
-            string newFileName = Path.ChangeExtension(Path.GetRandomFileName(),
-            Path.GetExtension(file.Name));
-
-            string path = Path.Combine(
-                config.GetValue<string>("FileStorage")!,
-                "tcorey", newFileName);
-
-            Directory.CreateDirectory(Path.Combine(config.GetValue<string>("FileStorage")!,
-            "tcorey"));
-
-            await using FileStream fileStream = new(path, FileMode.Create);
-            await file.OpenReadStream(maxFileSize).CopyToAsync(fileStream);
-        }
-        catch (Exception exception)
-        {
-            errors.Add($"File: {file.Name} Error: {exception.Message}");
-            throw;
-        }
-
-
-    }
-
     bool ShowComponent { get; set; }
+    bool multipleAnswer = false;
     private string selectedRadio;
 
     [Parameter]
@@ -139,7 +124,9 @@
                 Answer = addedAnswer,
                 PublicId = PublicId,
                 TimeLimit = timeLimit,
-                FakeAnswers = fakeAnswers
+                FakeAnswers = fakeAnswers,
+                HasMultipleAnswers = hasMultipleAnswers
+                
             };
         var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 
