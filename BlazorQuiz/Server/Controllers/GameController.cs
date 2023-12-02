@@ -27,13 +27,13 @@ namespace BlazorQuiz.Server.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var _quiz = _context.Quizzes.Where(x => x.PublicId == endgame.PublicId).FirstOrDefault();
-            var quiz = new GameModel
+            var quiz = new ScoreModel
             {
                 UserId = userId,
                 Score = endgame.Score,
                 QuizId = _quiz.Id
             };
-            _context.GameModels.Add(quiz);
+            _context.Scores.Add(quiz);
             _context.SaveChanges();
 
             // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };

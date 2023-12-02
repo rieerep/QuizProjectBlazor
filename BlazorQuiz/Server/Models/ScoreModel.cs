@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorQuiz.Server.Models
 {
-    public class GameModel
+    public class ScoreModel
     {
         [Key]
         public int Id { get; set; }

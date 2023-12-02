@@ -23,5 +23,8 @@ namespace BlazorQuiz.Shared
 
         public bool HasMultipleAnswers { get; set; }
 
+        public List<QuizViewModel> QuizTitle { get; set; }
+
+
     }
 }

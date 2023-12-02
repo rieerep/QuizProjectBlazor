@@ -9,9 +9,10 @@
 
 @if (gameOver == false)
 {
-    @if (questions.Count() > 0)
+    @if (questions.Count() > 0) 
     {
         <h3>Todo: Get quiz title of chosen quiz</h3>
+        @questions[questionIndex].QuizTitle[questionIndex].Title
 
         <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer, selectedAnswer )">
             <img src="@questions[questionIndex].MediaURL" width="300" height="400" />
@@ -63,6 +64,7 @@
             <button type="submit">Submit answer </button>
         </EditForm>
     }
+
 } else
 {
     <p>Game Over</p>

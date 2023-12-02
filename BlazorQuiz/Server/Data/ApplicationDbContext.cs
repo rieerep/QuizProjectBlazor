@@ -15,7 +15,7 @@ namespace BlazorQuiz.Server.Data
 
 		public DbSet<FakeAnswerModel> FakeAnswers { get; set; }
 
-        public DbSet<GameModel> GameModels { get; set; }
+        public DbSet<ScoreModel> Scores { get; set; }
 
         public ApplicationDbContext(
 			DbContextOptions options,

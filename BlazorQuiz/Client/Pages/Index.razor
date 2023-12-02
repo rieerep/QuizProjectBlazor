@@ -9,15 +9,23 @@
 
 <PageTitle>Home</PageTitle>
 
+
 @{
     var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
     var user = authenticationStateTask.Result.User;
 }
 
+
+
 <div class="body">
 @if (user.Identity?.IsAuthenticated ?? false)
 {
     <h3>Welcome, @user.Identity.Name</h3>
+
+        @foreach (var quizWithScore in quizzesWithScore)
+        {
+            
+        }
 
      <div class="quiz-list-container">
     <h3>List of your quizzes:</h3>
@@ -38,11 +46,15 @@
 
     private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
+    private IEnumerable<QuizWithScoreViewModel> quizzesWithScore = new List<QuizWithScoreViewModel>();
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
             quizzes = await Http.GetFromJsonAsync<List<QuizViewModel>>("api/quiz/get");
+            quizzesWithScore = await Http.GetFromJsonAsync<List<QuizWithScoreViewModel>>("api/quiz/getquizwithscore");
+
         }
         catch (AccessTokenNotAvailableException exception)
         {
