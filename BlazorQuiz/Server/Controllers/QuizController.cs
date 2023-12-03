@@ -1,4 +1,5 @@
 ﻿using BlazorQuiz.Server.Data;
+using BlazorQuiz.Server.Migrations;
 using BlazorQuiz.Server.Models;
 using BlazorQuiz.Shared;
 using create_a_quiz.Server.Models;
@@ -59,104 +60,143 @@ namespace create_a_quiz.Server.Controllers
             return userQuizzes;
         }
 
-
         [HttpGet("getquizwithscore")]
-
         public async Task<IEnumerable<QuizWithScoreViewModel>> GetQuizWithScore()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
             {
-                if (userId == null)
+                throw new ArgumentNullException("userID");
+            }
+
+            var userQuizzes = _context.Quizzes
+                .Where(u => u.UserId == userId).ToList();
+
+            var userScores = _context.Scores
+                .Where(s => userQuizzes.Any(q => q.Id == s.QuizId))
+                .ToList();
+
+            var quizWithScoreViewModels = userQuizzes
+                .Select(quiz => new QuizWithScoreViewModel
                 {
-                    throw new ArgumentNullException("userID");
+                    Title = quiz.Title,
+                    PublicId = quiz.PublicId,
+                    Score = userScores
+                    .Where(score => score.QuizId == quiz.Id)
+                    .Select(score => new ScoreViewModel
+                    {
+                      username = score.User.UserName,
+                      score = score.Score,
+                    })
+                    .ToList()
+                })
+                .ToList();
+
+        }
+
+            [HttpGet("getquizwithscore")]
+            public async Task<IEnumerable<QuizWithScoreViewModel>> GetQuizWithScore()
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var userName = user.UserName;
+
+
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                {
+                    if (userId == null)
+                    {
+                        throw new ArgumentNullException("userID");
+                    }
+
+                    var userQuizzes = _context.Quizzes
+                        .Where(u => u.UserId == userId)
+                        .Select(q => new QuizWithScoreViewModel
+                        {
+                            Title = q.Title,
+                            PublicId = q.PublicId,
+                            Score = _context.Scores.Where(s => s.QuizId == q.Id && s.UserId == userId)
+                        .Select(s => s.Score).FirstOrDefault(),
+                            User = userName
+                        })
+                        .ToList();
+
+                    return userQuizzes;
+
+                }
+            }
+
+            [HttpGet("chosenquiz/{publicId}")]
+            public async Task<List<QuestionViewModel>> ChosenQuiz(Guid publicId)
+            {
+                // konverta från question model till question view model
+                var quizInfo = _context.Quizzes.Where(q => q.PublicId == publicId)
+                    .Include(q => q.Questions).ThenInclude(f => f.FakeAnswers)
+                    .FirstOrDefault()
+                .Questions.Select(q => new QuestionViewModel
+                {
+                    Question = q.Question,
+                    FakeAnswers = q.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
+                    Answer = q.Answer,
+                    TimeLimit = q.TimeLimit
+                }).ToList();
+
+                // Check if the quiz exists
+                if (quizInfo == null)
+                {
+                    throw new Exception("Quiz not found");
                 }
 
-                var userQuizzes = _context.Quizzes
-                    .Where(u => u.UserId == userId)
-                    .Select(q => new QuizWithScoreViewModel
-                    {
-                        Title = q.Title,
-                        PublicId = q.PublicId,
-                        Score = _context.Scores.Where(s => s.QuizId == q.Id && s.UserId == userId)
-                    .Select(s => s.Score).FirstOrDefault()
-                    })
-                    .ToList();
+                // var question = quizInfo.Questions.First();
 
-                return userQuizzes;
+                //var questionViewModel = new QuestionViewModel
+                //{
+                //	Question = question.Question,
+                //	FakeAnswers = question.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
+                //	Answer = question.Answer,
+                //	TimeLimit = question.TimeLimit
+
+                //};
+
+                return quizInfo;
+
+                // Skapa en lista med Answer och fakeanswer tillsammans.
+                // Skicka in en lista som består av alla frågor som quizzet hr
+
+
+                // Select all questions where quizID = question.quizID
 
             }
-        }
 
-        [HttpGet("chosenquiz/{publicId}")]
-        public async Task<List<QuestionViewModel>> ChosenQuiz(Guid publicId)
-        {
-            // konverta från question model till question view model
-            var quizInfo = _context.Quizzes.Where(q => q.PublicId == publicId)
-                .Include(q => q.Questions).ThenInclude(f => f.FakeAnswers)
-                .FirstOrDefault()
-            .Questions.Select(q => new QuestionViewModel
-            {
-                Question = q.Question,
-                FakeAnswers = q.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
-                Answer = q.Answer,
-                TimeLimit = q.TimeLimit
-            }).ToList();
 
-            // Check if the quiz exists
-            if (quizInfo == null)
+            // POST api/<CreateQuizController>
+            [HttpPost("post")]
+            public IActionResult Post([FromBody] QuizViewModel model)
             {
-                throw new Exception("Quiz not found");
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var quiz = new QuizModel
+                {
+                    UserId = userId,
+                    Title = model.Title,
+                    PublicId = Guid.NewGuid()
+                };
+                _context.Quizzes.Add(quiz);
+                _context.SaveChanges();
+
+                // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
+
+                QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
+                return Ok(newQuizId);
             }
 
-            // var question = quizInfo.Questions.First();
 
-            //var questionViewModel = new QuestionViewModel
-            //{
-            //	Question = question.Question,
-            //	FakeAnswers = question.FakeAnswers.Select(f => f.FakeAnswer).ToArray(),
-            //	Answer = question.Answer,
-            //	TimeLimit = question.TimeLimit
+            //POST /api/quiz/checkanswer
+            [HttpPost]
 
-            //};
-
-            return quizInfo;
-
-            // Skapa en lista med Answer och fakeanswer tillsammans.
-            // Skicka in en lista som består av alla frågor som quizzet hr
-
-
-            // Select all questions where quizID = question.quizID
-
-        }
-
-
-        // POST api/<CreateQuizController>
-        [HttpPost("post")]
-        public IActionResult Post([FromBody] QuizViewModel model)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var quiz = new QuizModel
+            public IActionResult Post()
             {
-                UserId = userId,
-                Title = model.Title,
-                PublicId = Guid.NewGuid()
-            };
-            _context.Quizzes.Add(quiz);
-            _context.SaveChanges();
-
-            // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
-
-            QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
-            return Ok(newQuizId);
-        }
-
-
-        //POST /api/quiz/checkanswer
-        [HttpPost]
-
-        public IActionResult Post()
-        {
-            return null;
+                return null;
+            }
         }
     }
-}

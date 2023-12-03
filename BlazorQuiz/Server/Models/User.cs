@@ -4,5 +4,6 @@ namespace BlazorQuiz.Server.Models
 {
 	public class User : IdentityUser
 	{
-	}
+
+    }
 }

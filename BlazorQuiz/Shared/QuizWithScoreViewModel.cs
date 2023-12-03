@@ -9,7 +9,11 @@ namespace BlazorQuiz.Shared
     public class QuizWithScoreViewModel
     {
         public string Title { get; set; }
+
         public Guid PublicId { get; set; }
+
         public int Score { get; set; }
+
+        public string User {  get; set; }
     }
 }

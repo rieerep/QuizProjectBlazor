@@ -15,6 +15,12 @@
     var user = authenticationStateTask.Result.User;
 }
 
+@foreach (var quizwithscore in quizzesWithScore)
+{
+    <p>@quizwithscore.User</p>
+    <p>@quizwithscore.Title</p>
+    <p>@quizwithscore.Score</p>
+}
 
 
 <div class="body">
@@ -22,10 +28,7 @@
 {
     <h3>Welcome, @user.Identity.Name</h3>
 
-        @foreach (var quizWithScore in quizzesWithScore)
-        {
-            
-        }
+        
 
      <div class="quiz-list-container">
     <h3>List of your quizzes:</h3>
