@@ -2,7 +2,7 @@
 {
     internal class ScoreViewModel
     {
-        public object username { get; set; }
-        public int score { get; set; }
+        public object Username { get; set; }
+        public int Score { get; set; }
     }
 }
