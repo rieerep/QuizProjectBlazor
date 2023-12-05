@@ -17,20 +17,21 @@
 
             <form name="questionform">
                 <div class="form-group">
-                <label for="addquestion">Question</label><br />
-                <input type="text" id="question" class="form-control" @bind="addedQuestion" /><br />
-                <label for="addquestion" id="question">Answer</label><br />
-                <input type="text" id="answer" @bind=addedAnswer />
+                    <label for="addquestion">Question</label><br />
+                    <input type="text" id="question" class="form-control" @bind="addedQuestion" /><br />
+                    <label for="addquestion" id="question">Answer</label><br />
+                    <input type="text" id="answer" @bind=addedAnswer />
                 </div>
                 <br />
 
                 <!-- Multiple Question alternative-->
 
-                <label for="multi">Multi</label>
-                <input type="checkbox" id="multi" value="Flervalsfråga" @bind="multipleAnswer" />
+                <label for="multi">Multiple answer question:</label>
+                <input type="checkbox" id="multi" value="Flervalsfråga" @bind="hasMultipleAnswers" />
 
-                @if (multipleAnswer == true) {
-
+                @if (hasMultipleAnswers == true)
+                {
+                    <br />
                     <label for="addquestion">Fake answer 1</label>
                     <input type="text" id="question" @bind="fakeAnswers[0]" />
 
@@ -45,7 +46,8 @@
                     <br />
 
                 }
-                
+                <br />
+
 
                 <!-- Timed Quesitons-->
 
@@ -53,27 +55,43 @@
                 <label @onclick="() => ShowComponent = false" name="No timer">No timer</label>
                 <input type="radio" id="timer" name="timerchoice" value="2" />
                 <label @onclick="() => ShowComponent = true">Timer</label>
+
+                @if (ShowComponent)
+                {
+                    <MudRadioGroup Class="mt-2" @bind-SelectedOption=timeLimit>
+                        <MudRadio Option="10" Color="Color.Primary">10 seconds</MudRadio>
+                        <MudRadio Option="25" Color="Color.Primary">25 seconds</MudRadio>
+                        <MudRadio Option="50" Color="Color.Primary">50 seconds</MudRadio>
+                    </MudRadioGroup>
+
+                }
+                <br />
+
+                <!-- Upload Files or Add URL -->
+                <br />
+                <label>Do you want to add a picture or video to your quiz?</label>
+                <input type="radio" id="noMedia" name="mediachoice" @onchange="() => { imageURL = false; videoURL = false; }" />
+                <label name="mediachoice">No media</label>
+                <input type="radio" id="imageURL" name="mediachoice" value="0" @onchange="() => {imageURL = true; videoURL = false; }" />
+                <label @onclick="() => imageURL = true" name="mediachoice">Picture</label>
+                <input type="radio" id="videoURL" name="mediachoice" @onchange="() => {imageURL = false; videoURL = true; }" />
+                <label @onclick="() => videoURL = true" name="mediachoice">Video</label>
+                @if (imageURL)
+                {
+                    <label for="addedURL">Add URL for a picture</label>
+                    <input type="text" id="imageURL" @bind="addedURL" name="mediachoice">
+                }
+                @if (videoURL)
+                {
+                    <p>For youtube links, you need to use the embed-version.</p>
+                    <label for="addedURL">Add URL for a video</label>
+                    <input type="text" id="videoURL" @bind="addedURL" name="mediachoice">
+                }
+
+                <br />
+                <input type="button" value="Add Question" class="btn btn-primary" @onclick=AddQuestion>Add question</input>
+                <br />
             </form>
-            @if (ShowComponent)
-            {
-                <MudRadioGroup Class="mt-2" @bind-SelectedOption=timeLimit>
-                    <MudRadio Option="10" Color="Color.Primary">10 seconds</MudRadio>
-                    <MudRadio Option="25" Color="Color.Primary">25 seconds</MudRadio>
-                    <MudRadio Option="50" Color="Color.Primary">50 seconds</MudRadio>
-                </MudRadioGroup>
-
-            }
-            <br />
-
-            <!-- Upload Files or Add URL -->
-            <label for="addedURL">Add URL for a picture</label>
-            <input type="text" id="question" @bind="addedURL" />
-            @* <InputFile OnChange="@UploadFile" /> *@
-            <br />
-            <input type="button" value="Add Question" class="btn btn-primary" @onclick=AddQuestion>Add question</input>
-
-            <br />
-
         </Authorized>
 
         <NotAuthorized>
@@ -111,6 +129,8 @@
     private string addedURL = "";
     private string[] fakeAnswers = new string[3];
     private bool hasMultipleAnswers = false;
+    bool imageURL { get; set; }
+    bool videoURL { get; set; }
 
     private int timeLimit = 0;
 
@@ -125,14 +145,20 @@
                 PublicId = PublicId,
                 TimeLimit = timeLimit,
                 FakeAnswers = fakeAnswers,
-                HasMultipleAnswers = hasMultipleAnswers
-                
+                HasMultipleAnswers = hasMultipleAnswers,
+                MediaURL = addedURL,
+                IncludingImage = imageURL,
+                IncludingVideo = videoURL
             };
+
+        Console.WriteLine(newQuestion);
         var response = await Http.PostAsJsonAsync("api/question/", newQuestion);
 
         addedQuestion = "";
         addedAnswer = "";
         addedURL = "";
+        imageURL = false;
+        videoURL = false;
 
         for (int i = 0; i < fakeAnswers.Length; i++)
         {
@@ -141,6 +167,4 @@
         timeLimit = 0;
 
     }
-
-    //Lägg i question, answer och publicid i Questioncontrollern
 }

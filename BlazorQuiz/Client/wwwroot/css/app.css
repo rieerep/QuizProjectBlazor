@@ -1,8 +1,24 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
-html, body {
+/*html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: lightgoldenrodyellow
+}*/
+
+.mediaquiz {
+    display: flex;
+    justify-content: center;
+    padding: 3em;
+}
+
+.game-over {
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 50vh;
 }
 
 h1:focus {

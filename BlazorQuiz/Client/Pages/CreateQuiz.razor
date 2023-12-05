@@ -6,16 +6,21 @@
 @inject HttpClient Http
 @inject IConfiguration config
 
-<h3>CreateQuiz</h3>
+<h3>Create a new quiz!</h3>
 
 <AuthorizeView>
 	<Authorized>
 		<!-- Här sätter jag värdet på QuizViewModel.title-->
 		<form>
+			<label class="form-label" id="text">Choose a quiz title:</label>
+			<MudTextField @bind-Value="inputTitle" Label="Your quiz title" Variant="Variant.Text"></MudTextField>
+
 			<input @bind="inputTitle" type="text" />
 			<input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
+
 		</form>
 		<p>@titles.PublicId</p>
+
 		<a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
 	</Authorized>
 	<NotAuthorized>
@@ -24,7 +29,7 @@
 </AuthorizeView>
 
 @code {
-	// skapa ett fält
+
 	string? inputTitle;
 	private QuizTitleViewModel titles = new QuizTitleViewModel();
 

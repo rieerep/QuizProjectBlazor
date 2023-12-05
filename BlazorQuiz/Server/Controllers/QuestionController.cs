@@ -24,14 +24,6 @@ namespace BlazorQuiz.Server.Controllers
         }
 
         [HttpPost]
-
-        //public IActionResult Post([FromBody] QuestionViewModel model)
-        //{
-        //    var currentQuestion = _context.Questions.Where(q => q.Id == model.id)
-        //}
-
-        //POST api/<CreateQuestionController>
-        [HttpPost]
         public IActionResult Post([FromBody] QuestionViewModel model)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -49,7 +41,9 @@ namespace BlazorQuiz.Server.Controllers
                     new FakeAnswerModel() { FakeAnswer = model.FakeAnswers[2]}
                 },
                 MediaURL = model.MediaURL,
-                HasMultipleAnswers = model.HasMultipleAnswers
+                HasMultipleAnswers = model.HasMultipleAnswers,
+                ImageUrl = model.IncludingImage,
+                VideoUrl = model.IncludingVideo
 
             };
 

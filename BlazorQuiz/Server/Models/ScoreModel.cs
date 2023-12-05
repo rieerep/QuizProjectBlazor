@@ -17,7 +17,7 @@ namespace BlazorQuiz.Server.Models
         [ForeignKey("Player")]
         public string UserId { get; set; }
 
-        public virtual User? Player { get; set; }
+        public virtual User? ExternalPlayer { get; set; }
 
         [Required]
         public int Score { get; set; }

@@ -21,9 +21,13 @@ namespace BlazorQuiz.Shared
 
         public string MediaURL { get; set; }
 
+        public bool IncludingImage { get; set; }
+
+        public bool IncludingVideo { get; set; }
+
         public bool HasMultipleAnswers { get; set; }
 
-        public List<QuizViewModel> QuizTitle { get; set; }
+        // public List<QuizViewModel> QuizTitle { get; set; }
 
 
     }

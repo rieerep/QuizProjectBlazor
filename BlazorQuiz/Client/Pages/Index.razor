@@ -1,51 +1,119 @@
 ﻿@page "/"
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
-<style>
-@@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
-</style>
+
 @using BlazorQuiz.Shared
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@using System.Timers;
 
 <PageTitle>Home</PageTitle>
-
 
 @{
     var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
     var user = authenticationStateTask.Result.User;
 }
 
-@foreach (var quizwithscore in quizzesWithScore)
-{
-    <p>@quizwithscore.User</p>
-    <p>@quizwithscore.Title</p>
-    <p>@quizwithscore.Score</p>
-}
+<body>
+    
+        @if (user.Identity?.IsAuthenticated ?? false)
+        {
+            <div class="hero">
+            <h3>Welcome, @user.Identity.Name</h3>
+            </div>
+            <div class="homepage">
+            <table class="scoretable">
+                <thead class="table-head">
+                    <tr>
+                        <th scope="col">User</th>
+                        <th scope="col">Quiz</th>
+                        <th scope="col">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var quizwithscore in quizzesWithScore)
+                    {
+                        <tr align="center">
+                            <td width="100">@quizwithscore.UserName</td>
+                            <td>@quizwithscore.Title</td>
+                            <td>@quizwithscore.Score</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
 
 
-<div class="body">
-@if (user.Identity?.IsAuthenticated ?? false)
-{
-    <h3>Welcome, @user.Identity.Name</h3>
+            <div class="quiz-list-container">
+                <h3>List of your quizzes:</h3>
 
-        
+                @if (quizzes != null)
+                {
+                    foreach (var quiz in quizzes)
+                    {
+                        <p>@quiz.Title</p>
+                    }
+                }
+                else
+                {
+                    <p>Loading...</p>
+                }
 
-     <div class="quiz-list-container">
-    <h3>List of your quizzes:</h3>
-
-    @foreach (var quiz in quizzes)
-    {
-            <p>@quiz.Title</p>  
-    }
-    </div>
-} else
-{
-    <h1>Hello, world!</h1>
-}
-</div>
+            </div>
+        </div>
+        }
+        else
+        {
+            <h1>Hello, world!</h1>
+        }
+</body>
 
 
 @code {
+
+    private System.Timers.Timer _timer = null!;  //Time variable
+    private int _secondsToRun = 0;
+    protected string Time { get; set; } = "00:00";   //Time UI variable and format
+
+    //isTimeOut är min egen, sätter den till true på rätt plats för att kunna visa för användaren att tiden är över
+    public bool isTimeOut = false;
+
+    //metod som startar tiden och sätter format på Time strängen, notera att argumentet som tas in är alltså tiden som är satt,
+    //secondsToRun = 10 kommer då alltså räkna ned från 10.
+    public void StartTime(int secondsToRun)
+    {
+        _secondsToRun = secondsToRun;
+        if (_secondsToRun > 0)
+        {
+            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+            StateHasChanged();
+            _timer.Start();
+        }
+    }
+
+
+    //Metod som fortsätter köra nedräkningen
+    public event Action TimerOut; //Jag vet faktiskt inte riktigt vad TimerOut gör, men den verkar behövas
+    private async void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    {
+        _secondsToRun--;
+        await InvokeAsync(() =>
+        {
+
+            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+            StateHasChanged();
+        });
+        if (_secondsToRun <= 0)
+        {
+            _timer.Stop();
+            TimerOut?.Invoke();
+        }
+    }
+
+    //Tror inte jag använder Dispose() men jag har den ändå
+    public void Dispose()
+    {
+        _timer.Dispose();
+    }
 
     private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
@@ -53,10 +121,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _timer = new System.Timers.Timer(1000);
+        _timer.Elapsed += OnTimedEvent;
+        _timer.AutoReset = true;
+
+
         try
         {
             quizzes = await Http.GetFromJsonAsync<List<QuizViewModel>>("api/quiz/get");
-            quizzesWithScore = await Http.GetFromJsonAsync<List<QuizWithScoreViewModel>>("api/quiz/getquizwithscore");
+            quizzesWithScore = await Http.GetFromJsonAsync<List<QuizWithScoreViewModel>>("api/score/get");
+
 
         }
         catch (AccessTokenNotAvailableException exception)
@@ -64,6 +138,9 @@
             exception.Redirect();
 
         }
+
+        StartTime(20);
+
     }
 
 }

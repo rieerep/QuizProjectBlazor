@@ -35,10 +35,6 @@ namespace BlazorQuiz.Server.Controllers
             };
             _context.Scores.Add(quiz);
             _context.SaveChanges();
-
-            // QuizViewModel newQuizId = new QuizViewModel() { PublicId = quiz.PublicId };
-
-            // QuizTitleViewModel newQuizId = new QuizTitleViewModel() { PublicId = quiz.PublicId };
             return Ok();
         }
     }

@@ -5,6 +5,7 @@
     background-color: #f4f4f4;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
 }
 
 .quiz-question {
@@ -56,3 +57,31 @@
         font-size: 1em;
     }
 }
+
+
+.game-over {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    background-color: lightcoral;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 40%;
+}
+
+    .game-over h2 {
+        font-family: cursive;
+        font-style: italic;
+        color: black;
+    }
+
+    .game-over p {
+        font-size: 20px;
+        color: gray;
+        line-height: initial;
+        font-weight: normal;
+    }

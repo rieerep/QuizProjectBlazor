@@ -6,71 +6,109 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @using Microsoft.AspNetCore.Components
 
-
-@if (gameOver == false)
+@if (questions[questionIndex] == null || questions.Count() == 0 || questions[questionIndex] == null)
 {
-    @if (questions.Count() > 0) 
+    <p>Quiz contains no questions.</p>
+}
+    @if (gameOver == false)
     {
-        <h3>Todo: Get quiz title of chosen quiz</h3>
-        @questions[questionIndex].QuizTitle[questionIndex].Title
 
-        <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer, selectedAnswer )">
-            <img src="@questions[questionIndex].MediaURL" width="300" height="400" />
+        <h3>Play quiz!</h3>
+        <div class="mediaquiz">
+
+            
+            @if (questions[questionIndex].IncludingVideo == true)
+            {
+                <iframe width="640" height="480" src="@questions[questionIndex].MediaURL"></iframe>
+            }
+            @if (questions[questionIndex].IncludingImage == true)
+            {
+                Console.WriteLine(@questions[questionIndex].MediaURL);
+                
+                <img src="@questions[questionIndex].MediaURL" width="500" />
+            }
+        </div>
+        
+
+        <div class="quiz-container">
+        <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer.ToLower().Trim(), selectedAnswer.ToLower().Trim() )">
+
+            
+
             @if (questions[questionIndex].TimeLimit > 0)
             {
                 <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
             }
 
-            <img src="" />
             <h4>@questions[questionIndex].Question</h4>
             @* <li>
     <label>@questions[questionIndex].Answer</label>
     <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = questions[questionIndex].Answer)">
     </li> *@
 
+
             @if (questions[questionIndex].HasMultipleAnswers == true)
             {
-                @foreach (var option in options)
+                    @foreach (var option in options)
+                    {
+                        <li>
+                            @* <label>@option</label> *@
+                            @* <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)"> *@
+@*                             <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
+ *@                            <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
+
+                        </li>
+                    }
+                @* <label for="textinput">Type your answer</label>
+                <input type="text" id="textinput"> *@
+            }
+            else
+            {
+
+                    <label for="textinput">Type your answer</label>
+                    //<input type="text" id="textinput">
+                    <input id="textinput"  type="text" class="form-control" @onchange="@((e) => TextAnswer(e.Value.ToString()))" disabled="@isDisabled" />
+                    
+               @*  @foreach (var option in options)
                 {
                     <li>
-                        @*   <label>@option</label>
-        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
-        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
-        *@                    <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
+                        <label>@option</label>
+                        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
+                        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
+                        <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
 
                     </li>
-                }
-
-            } else
-            {
-            <input type="text">
+                } *@
             }
 
             <p>Your answer: @selectedAnswer</p>
-            @questionIndex
 
             @if (isCorrectAnswer == true)
             {
-            <p>Correct</p>
+                <p>Correct answer!</p>
             }
 
             @if (isWrongAnswer == true)
             {
-            <p>Wrong</p>
+                <p>Wrong answer!</p>
             }
 
-            <p>@score</p>
-            <p id>questions count: @questions.Count()</p>
+            <p>Score: @score</p>
             <button type="submit">Submit answer </button>
         </EditForm>
+        </div>
     }
 
-} else
+
+else
 {
-    <p>Game Over</p>
-}
-
-
+    <div class="game-over">
+        <h2>Game Over</h2>
+        
+        <p>Your score: @score</p>
+    </div>
+  
+    }           
 
 @code {
 
@@ -82,6 +120,8 @@
     bool isDisabled = false;
     bool isCorrectAnswer = false;
     bool isWrongAnswer = false;
+    string timeUpAlert = "";
+    int timeLimit;
 
     // public List<Question> Questions { get; set; } = new List<Question>();
 
@@ -99,6 +139,7 @@
 
     private void Click(string answer)
     {
+        Console.WriteLine("Option: " + answer);
         if (answer == questions[questionIndex].Answer)
         {
             isCorrectAnswer = true;
@@ -111,17 +152,23 @@
         isDisabled = true;
     }
 
-    private void TextAnswer(string answer)
+    private void TextAnswer(string guess)
     {
-        if (answer.ToLower().Trim() == questions[questionIndex].Answer.ToLower().Trim())
+        if (guess.ToLower().Trim() == questions[questionIndex].Answer.ToLower().Trim())
         {
+            Console.WriteLine("Text input: " + guess);
+            Console.WriteLine("This is correct bool" + isCorrectAnswer);
+            DateTime endTime = DateTime.Now;
+
             isCorrectAnswer = true;
         }
         else
         {
+            Console.WriteLine("This is correct bool" + isWrongAnswer);
+
             isWrongAnswer = true;
         }
-        selectedAnswer = answer;
+        selectedAnswer = guess;
         isDisabled = true;
     }
 
@@ -168,19 +215,22 @@
         isDisabled = false;
         DateTime endTime = DateTime.Now;
 
+        Console.WriteLine("Startime: " + startTime);
         Console.WriteLine("Endtime: " + endTime);
-        Console.WriteLine("Startime" + startTime);
+        Console.WriteLine("questionindex" + questionIndex);
+
         // var response = await Http.PostAsJsonAsync("api/quiz", selectedAnswer);
         // var result = await response.Content.ReadAsStringAsync();
 
         TimeSpan elapsedTime = endTime - startTime;
         int secondsElapsed = (int)elapsedTime.TotalSeconds;
 
-        if (secondsElapsed > questions[questionIndex].TimeLimit)
+        if (secondsElapsed > questions[questionIndex].TimeLimit && questions[questionIndex].TimeLimit > 0)
         {
-            Thread.Sleep(3000);
+            Console.WriteLine("Time out");
+            timeUpAlert = "Time is up! No score.";
         }
-        if (guess == answer && secondsElapsed < questions[questionIndex].TimeLimit)
+        else if (guess == answer)
         {
             Console.WriteLine("Score: " + score);
             score++;
@@ -195,6 +245,7 @@
         {
             isCorrectAnswer = false;
             isWrongAnswer = false;
+            selectedAnswer = "";
             questionIndex++;
             if (questions != null)
             {

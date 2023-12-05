@@ -1,10 +1,14 @@
 ﻿.quiz-list-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 300px;
+    /*    margin: 0 auto;*/
+    padding: 10px;
     background-color: #f4f4f4;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-list {
+    max-width: 300px;
 }
 
 p {
@@ -17,9 +21,35 @@ p {
 
 }
 
+.hero {
+    display: flex;
+    z-index: 1;
+    justify-content: center;
+}
+
 h3 {
     font-family: Gadugi;
     display: flex;
     justify-content: center;
     padding: 1em
+}
+
+body {
+    display: flex;
+}
+
+tr:nth-child(even) {
+    background-color: #f28c8c;
+}
+
+.homepage {
+    display: flex;
+    justify-content:center;
+    margin-top: 200px;
+    z-index: 2;
+    background-color: honeydew;
+}
+
+.scoretable {
+    margin-right: 50px;
 }

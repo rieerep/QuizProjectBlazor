@@ -14,6 +14,6 @@ namespace BlazorQuiz.Shared
 
         public int Score { get; set; }
 
-        public string User {  get; set; }
+        public string UserName {  get; set; }
     }
 }
