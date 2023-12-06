@@ -175,6 +175,8 @@ else
         {
             exception.Redirect();
         }
+
+        // This is to handle quizzes that doesnt contain any quizzes.
         if (questions != null && questions.Any() && questionIndex < questions.Count)
         {
             options.Clear();
