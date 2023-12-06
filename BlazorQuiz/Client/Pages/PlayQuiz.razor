@@ -7,11 +7,13 @@
 @using Microsoft.AspNetCore.Components
 
 
-@if (questions.Count() == 0 || questions[questionIndex] == null)
+@if (isLoading)
 {
-    <h5>Quiz contains no questions! Pick another quiz.</h5>
-    Console.WriteLine("Error test");
-    gameOver = true;
+    <p>Loading... </p>
+}
+@if (questions.Count() == 0)
+{
+   <p>quiz contains no questions.</p>
 }
     @if (gameOver == false)
     {
@@ -102,6 +104,8 @@ else
     string timeUpAlert = "";
     int timeLimit;
     bool noQuestionsQuiz = false;
+    bool isLoading = true;
+    bool timeUp = false;
 
     [Parameter]
     public Guid? PublicId { get; set; }
@@ -145,7 +149,7 @@ else
 
             isWrongAnswer = true;
         }
-        selectedAnswer = guess;
+        selectedAnswer = "";
         isDisabled = true;
     }
 
@@ -155,6 +159,7 @@ else
         try
         {
             questions = await Http.GetFromJsonAsync<List<QuestionViewModel>>($"api/quiz/chosenquiz/{PublicId}");
+            isLoading = false;
 
             if (questions == null || questions.Count == 0)
             {
@@ -212,6 +217,7 @@ else
 
         if (secondsElapsed > questions[questionIndex].TimeLimit && questions[questionIndex].TimeLimit > 0)
         {
+            timeUp = true;
             Console.WriteLine("Time out");
             timeUpAlert = "Time is up! No score.";
         }
