@@ -33,15 +33,15 @@
                 {
                     <br />
                     <label for="addquestion">Fake answer 1</label>
-                    <input type="text" id="question" @bind="fakeAnswers[0]" />
+                    <input class="multiinput" type="text" id="question" @bind="fakeAnswers[0]" />
 
                     <br />
                     <label for="addquestion">Fake answer 2</label>
-                    <input type="text" id="question" @bind="fakeAnswers[1]" />
+                    <input class="multiinput" type="text" id="question" @bind="fakeAnswers[1]" />
 
                     <br />
                     <label for="addquestion">Fake answer 3</label>
-                    <input type="text" id="question" @bind="fakeAnswers[2]" />
+                    <input class="multiinput" type="text" id="question" @bind="fakeAnswers[2]" />
 
                     <br />
 
@@ -83,7 +83,7 @@
                 }
                 @if (videoURL)
                 {
-                    <p>For youtube links, you need to use the embed-version.</p>
+                    <p id="embedyoutubewarning">For youtube links, you need to use the embed-version found under "share" on youtube.com. It should look like this: https://www.youtube.com/embed/-PkdLMIz-Ys?si=atF4xxZBhsJlTgke </p>
                     <label for="addedURL">Add URL for a video</label>
                     <input type="text" id="videoURL" @bind="addedURL" name="mediachoice">
                 }

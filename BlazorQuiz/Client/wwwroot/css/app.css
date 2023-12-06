@@ -4,6 +4,11 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }*/
 
+#embedyoutubewarning p {
+    color: red;
+
+}
+
 .mediaquiz {
     display: flex;
     justify-content: center;

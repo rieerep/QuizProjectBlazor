@@ -41,44 +41,20 @@
             }
 
             <h4>@questions[questionIndex].Question</h4>
-            @* <li>
-    <label>@questions[questionIndex].Answer</label>
-    <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = questions[questionIndex].Answer)">
-    </li> *@
-
 
             @if (questions[questionIndex].HasMultipleAnswers == true)
             {
                     @foreach (var option in options)
                     {
                         <li>
-                            @* <label>@option</label> *@
-                            @* <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)"> *@
-@*                             <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
- *@                            <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
-
+                            <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
                         </li>
                     }
-                @* <label for="textinput">Type your answer</label>
-                <input type="text" id="textinput"> *@
             }
             else
             {
-
                     <label for="textinput">Type your answer</label>
-                    //<input type="text" id="textinput">
                     <input id="textinput"  type="text" class="form-control" @onchange="@((e) => TextAnswer(e.Value.ToString()))" disabled="@isDisabled" />
-                    
-               @*  @foreach (var option in options)
-                {
-                    <li>
-                        <label>@option</label>
-                        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
-                        <input type="radio" name="userChoice" @onchange="@(() => selectedAnswer = option)">
-                        <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
-
-                    </li>
-                } *@
             }
 
             <p>Your answer: @selectedAnswer</p>
@@ -123,20 +99,16 @@ else
     string timeUpAlert = "";
     int timeLimit;
 
-    // public List<Question> Questions { get; set; } = new List<Question>();
-
-    // [Parameter]
-    // public int questionindex { get; set; } = 0;
-
     [Parameter]
     public Guid? PublicId { get; set; }
 
-    // private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
     private List<QuestionViewModel> questions = new List<QuestionViewModel>();
 
     private List<string> options = new List<string>();
 
+
+    // Method to handle multiple options answers
     private void Click(string answer)
     {
         Console.WriteLine("Option: " + answer);
@@ -152,6 +124,7 @@ else
         isDisabled = true;
     }
 
+    // Method to handle free text inputs
     private void TextAnswer(string guess)
     {
         if (guess.ToLower().Trim() == questions[questionIndex].Answer.ToLower().Trim())
@@ -196,6 +169,7 @@ else
         }
     }
 
+    // Random function to shuffle answers from the user
     private Random rng = new Random();
     public void Shuffle<T>(List<T> list)
     {

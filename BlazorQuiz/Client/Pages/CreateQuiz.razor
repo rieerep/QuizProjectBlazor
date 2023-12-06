@@ -9,43 +9,45 @@
 <h3>Create a new quiz!</h3>
 
 <AuthorizeView>
-	<Authorized>
-		<!-- Här sätter jag värdet på QuizViewModel.title-->
-		<form>
-			<label class="form-label" id="text">Choose a quiz title:</label>
-			<MudTextField @bind-Value="inputTitle" Label="Your quiz title" Variant="Variant.Text"></MudTextField>
+    <Authorized>
 
-			<input @bind="inputTitle" type="text" />
-			<input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
+        <!-- Här sätter jag värdet på QuizViewModel.title-->
+        <form>
+            <label class="form-label" id="text">Choose a quiz title:</label>
+            <MudTextField @bind-Value="inputTitle" Label="Your quiz title" Variant="Variant.Text" disabled="@(!string.IsNullOrEmpty(inputTitle))" ></MudTextField>
 
-		</form>
-		<p>@titles.PublicId</p>
 
-		<a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
-	</Authorized>
-	<NotAuthorized>
-		<p>Du måste logga in för att skapa ett quiz.</p>
-	</NotAuthorized>
+            <input @bind="inputTitle" type="text"  />
+            <input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
+
+        </form>
+        <p>@titles.PublicId</p>
+
+        <a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
+    </Authorized>
+    <NotAuthorized>
+        <p>Du måste logga in för att skapa ett quiz.</p>
+    </NotAuthorized>
 </AuthorizeView>
 
 @code {
 
-	string? inputTitle;
-	private QuizTitleViewModel titles = new QuizTitleViewModel();
+    string? inputTitle;
+    private QuizTitleViewModel titles = new QuizTitleViewModel();
 
-	private async Task CreateQuizAsync()
-	{
-		QuizViewModel newQuiz = new QuizViewModel()
-			{
-				Title = inputTitle
-			};
-		var response = await Http.PostAsJsonAsync("api/quiz/post", newQuiz);
-		if (response == null)
-		{
-			Console.WriteLine("Got null response");
-			return;
-		}
-		titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
-		StateHasChanged();
-	}
+    private async Task CreateQuizAsync()
+    {
+        QuizViewModel newQuiz = new QuizViewModel()
+            {
+                Title = inputTitle
+            };
+        var response = await Http.PostAsJsonAsync("api/quiz/post", newQuiz);
+        if (response == null)
+        {
+            Console.WriteLine("Got null response");
+            return;
+        }
+        titles = await response.Content.ReadFromJsonAsync<QuizTitleViewModel>();
+        StateHasChanged();
+    }
 }
