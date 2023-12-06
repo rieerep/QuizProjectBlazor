@@ -15,15 +15,15 @@
         <form>
             <label class="form-label" id="text">Choose a quiz title:</label>
             <MudTextField @bind-Value="inputTitle" Label="Your quiz title" Variant="Variant.Text" disabled="@(!string.IsNullOrEmpty(inputTitle))" ></MudTextField>
-
-
-            <input @bind="inputTitle" type="text"  />
             <input type="button" value="Submit" @onclick=CreateQuizAsync>Create quiz</input>
 
         </form>
         <p>@titles.PublicId</p>
 
-        <a href="/addquestion/@titles.PublicId">Add questions to quiz.</a>
+        <div class="navigatetoquestions">
+            <a href="/addquestion/@titles.PublicId">Click here to add questions to quiz.</a>
+        </div>
+
     </Authorized>
     <NotAuthorized>
         <p>Du måste logga in för att skapa ett quiz.</p>
