@@ -15,12 +15,6 @@ p {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
-.main {
-
-    background-color: goldenrod;
-
-}
-
 .hero {
     display: flex;
     z-index: 1;
@@ -35,6 +29,7 @@ h3 {
 }
 
 body {
+
     display: flex;
 }
 
@@ -44,7 +39,7 @@ tr:nth-child(even) {
 
 .homepage {
     display: flex;
-    justify-content:center;
+    justify-content: space-between;
     margin-top: 200px;
     z-index: 2;
     background-color: honeydew;
@@ -52,4 +47,10 @@ tr:nth-child(even) {
 
 .scoretable {
     margin-right: 50px;
+
+}
+
+#scoretable td, #scoretable th {
+    border: 1px solid #808080ff;
+    padding: 8px;
 }

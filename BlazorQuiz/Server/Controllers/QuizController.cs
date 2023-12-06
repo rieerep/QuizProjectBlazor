@@ -1,5 +1,4 @@
 ﻿using BlazorQuiz.Server.Data;
-using BlazorQuiz.Server.Migrations;
 using BlazorQuiz.Server.Models;
 using BlazorQuiz.Shared;
 using create_a_quiz.Server.Models;

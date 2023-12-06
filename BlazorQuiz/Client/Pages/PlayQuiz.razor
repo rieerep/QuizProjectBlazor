@@ -13,7 +13,8 @@
 }
 @if (questions.Count() == 0)
 {
-   <p>quiz contains no questions.</p>
+    <p>message</p>
+    <p>quiz contains no questions.</p>
 }
     @if (gameOver == false)
     {
@@ -106,6 +107,7 @@ else
     bool noQuestionsQuiz = false;
     bool isLoading = true;
     bool timeUp = false;
+    string message;
 
     [Parameter]
     public Guid? PublicId { get; set; }
@@ -164,6 +166,7 @@ else
             if (questions == null || questions.Count == 0)
             {
                 noQuestionsQuiz = true;
+                message = "The quiz does not contain any questions...";
                 return;
             }
 

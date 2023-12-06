@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorQuiz.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231121195632_fakeanswer")]
-    partial class fakeanswer
+    [Migration("20231206150401_initcreate")]
+    partial class initcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,21 +32,47 @@ namespace BlazorQuiz.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("FakeAnswers")
-                        .IsRequired()
+                    b.Property<string>("FakeAnswer")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Question")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("QuestionModelId")
+                    b.Property<int?>("QuestionsId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QuestionModelId");
+                    b.HasIndex("QuestionsId");
 
                     b.ToTable("FakeAnswers");
+                });
+
+            modelBuilder.Entity("BlazorQuiz.Server.Models.ScoreModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Scores");
                 });
 
             modelBuilder.Entity("BlazorQuiz.Server.Models.User", b =>
@@ -128,11 +154,24 @@ namespace BlazorQuiz.Server.Migrations
                     b.Property<int>("Fk_QuizId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HasMultipleAnswers")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ImageUrl")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MediaURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Question")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Timer")
+                    b.Property<int>("TimeLimit")
                         .HasColumnType("int");
+
+                    b.Property<bool>("VideoUrl")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -153,6 +192,7 @@ namespace BlazorQuiz.Server.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -445,9 +485,30 @@ namespace BlazorQuiz.Server.Migrations
 
             modelBuilder.Entity("BlazorQuiz.Server.Models.FakeAnswerModel", b =>
                 {
-                    b.HasOne("create_a_quiz.Server.Models.QuestionModel", null)
+                    b.HasOne("create_a_quiz.Server.Models.QuestionModel", "Questions")
                         .WithMany("FakeAnswers")
-                        .HasForeignKey("QuestionModelId");
+                        .HasForeignKey("QuestionsId");
+
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("BlazorQuiz.Server.Models.ScoreModel", b =>
+                {
+                    b.HasOne("create_a_quiz.Server.Models.QuizModel", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlazorQuiz.Server.Models.User", "ExternalPlayer")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExternalPlayer");
+
+                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("create_a_quiz.Server.Models.QuestionModel", b =>
