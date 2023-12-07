@@ -66,6 +66,11 @@
 
                 <p>Your answer: @selectedAnswer</p>
 
+                    @if (timeUp)
+                    {
+                    <p>@timeUpAlert</p>
+                    }
+
                 @if (isCorrectAnswer == true)
                 {
                     <p>Correct answer!</p>
@@ -77,7 +82,7 @@
                 }
 
                 <p>Score: @score</p>
-                <button type="submit">Submit answer </button>
+                <button type="submit" class="btn btn-outline-warning">Submit answer </button>
             </EditForm>
         </div>
     }
@@ -101,6 +106,7 @@
     bool isLoading = true;
     bool timeUp = false;
     string message = "This quiz contains no questions. Try another one.";
+    bool isAnswered = false;
 
     [Parameter]
     public Guid? PublicId { get; set; }
@@ -118,6 +124,15 @@
         TimeSpan elapsedTime = endTime - startTime;
 
         int secondsElapsed = (int)elapsedTime.TotalSeconds;
+
+        if (secondsElapsed > questions[questionIndex].TimeLimit && questions[questionIndex].TimeLimit > 0)
+        {
+            timeUp = true;
+            Console.WriteLine("Time out");
+            timeUpAlert = "Time is up! No score on. Make sure to answer within time limit";
+
+            Thread.Sleep(2000);
+        }
 
         if (answer == questions[questionIndex].Answer)
         {
@@ -143,6 +158,13 @@
             TimeSpan elapsedTime = endTime - startTime;
             int secondsElapsed = (int)elapsedTime.TotalSeconds;
 
+            if (secondsElapsed > questions[questionIndex].TimeLimit && questions[questionIndex].TimeLimit > 0)
+            {
+                timeUp = true;
+                Console.WriteLine("Time out");
+                timeUpAlert = "Time is up! No score. Make sure to answer within time limit";
+            }
+
             isCorrectAnswer = true;
         }
         else
@@ -153,6 +175,7 @@
         }
         selectedAnswer = "";
         isDisabled = true;
+        isAnswered = true;
     }
 
 
@@ -217,11 +240,11 @@
         {
             timeUp = true;
             Console.WriteLine("Time out");
-            timeUpAlert = "Time is up! No score.";
+            timeUpAlert = "Time is up! No score. Make sure to answer within time limit";
 
             Thread.Sleep(2000);
         }
-        else if (guess == answer)
+        else if (guess == answer && secondsElapsed < questions[questionIndex].TimeLimit)
         {
             Console.WriteLine("Score: " + score);
             score++;
@@ -238,6 +261,7 @@
             isWrongAnswer = false;
             selectedAnswer = "";
             questionIndex++;
+            timeUp = false;
             if (questions != null)
             {
                 options.Clear();

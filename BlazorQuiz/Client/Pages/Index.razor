@@ -9,6 +9,8 @@
 
 <PageTitle>Home</PageTitle>
 
+<p></p>
+
 @{
     var authenticationStateTask = AuthenticationStateProvider.GetAuthenticationStateAsync();
     var user = authenticationStateTask.Result.User;
@@ -85,41 +87,41 @@
 
     //metod som startar tiden och sätter format på Time strängen, notera att argumentet som tas in är alltså tiden som är satt,
     //secondsToRun = 10 kommer då alltså räkna ned från 10.
-    // public void StartTime(int secondsToRun)
-    // {
-    //     _secondsToRun = secondsToRun;
-    //     if (_secondsToRun > 0)
-    //     {
-    //         Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
-    //         StateHasChanged();
-    //         _timer.Start();
-    //     }
-    // }
+    public void StartTime(int secondsToRun)
+    {
+        _secondsToRun = secondsToRun;
+        if (_secondsToRun > 0)
+        {
+            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+            StateHasChanged();
+            _timer.Start();
+        }
+    }
 
 
     //Metod som fortsätter köra nedräkningen
-    // public event Action TimerOut; //Jag vet faktiskt inte riktigt vad TimerOut gör, men den verkar behövas
-    // private async void OnTimedEvent(object? sender, ElapsedEventArgs e)
-    // {
-    //     _secondsToRun--;
-    //     await InvokeAsync(() =>
-    //     {
+    public event Action TimerOut; //Jag vet faktiskt inte riktigt vad TimerOut gör, men den verkar behövas
+    private async void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    {
+        _secondsToRun--;
+        await InvokeAsync(() =>
+        {
 
-    //         Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
-    //         StateHasChanged();
-    //     });
-    //     if (_secondsToRun <= 0)
-    //     {
-    //         _timer.Stop();
-    //         TimerOut?.Invoke();
-    //     }
-    // }
+            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+            StateHasChanged();
+        });
+        if (_secondsToRun <= 0)
+        {
+            _timer.Stop();
+            TimerOut?.Invoke();
+        }
+    }
 
     //Tror inte jag använder Dispose() men jag har den ändå
-    // public void Dispose()
-    // {
-    //     _timer.Dispose();
-    // }
+    public void Dispose()
+    {
+        _timer.Dispose();
+    }
 
     private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
