@@ -43,7 +43,7 @@
             </table>
 
             <div class="quiz-list-container">
-                <h6>List of your quizzes:</h6>
+                <h3>List of your quizzes:</h3>
 
                 @if (quizzes != null)
                 {
@@ -52,9 +52,12 @@
                         <p>@quiz.Title</p>
                     }
                 }
-                else
+                else if (noUserQuizMessage == true)
                 {
-                    <p>Loading...</p>
+                    <p>Your list is empty. Try create a new quiz!</p>
+                    <a href="/createquiz">
+                        <Button Color="ButtonColor.Primary" Outline="true"> Click here to create a new quiz </Button>
+                    </a>
                 }
 
             </div>
@@ -70,6 +73,7 @@
 @code {
 
     bool showShareLink = false;
+    bool noUserQuizMessage = false;
 
 
     private System.Timers.Timer _timer = null!;  //Time variable
@@ -81,41 +85,41 @@
 
     //metod som startar tiden och sätter format på Time strängen, notera att argumentet som tas in är alltså tiden som är satt,
     //secondsToRun = 10 kommer då alltså räkna ned från 10.
-    public void StartTime(int secondsToRun)
-    {
-        _secondsToRun = secondsToRun;
-        if (_secondsToRun > 0)
-        {
-            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
-            StateHasChanged();
-            _timer.Start();
-        }
-    }
+    // public void StartTime(int secondsToRun)
+    // {
+    //     _secondsToRun = secondsToRun;
+    //     if (_secondsToRun > 0)
+    //     {
+    //         Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+    //         StateHasChanged();
+    //         _timer.Start();
+    //     }
+    // }
 
 
     //Metod som fortsätter köra nedräkningen
-    public event Action TimerOut; //Jag vet faktiskt inte riktigt vad TimerOut gör, men den verkar behövas
-    private async void OnTimedEvent(object? sender, ElapsedEventArgs e)
-    {
-        _secondsToRun--;
-        await InvokeAsync(() =>
-        {
+    // public event Action TimerOut; //Jag vet faktiskt inte riktigt vad TimerOut gör, men den verkar behövas
+    // private async void OnTimedEvent(object? sender, ElapsedEventArgs e)
+    // {
+    //     _secondsToRun--;
+    //     await InvokeAsync(() =>
+    //     {
 
-            Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
-            StateHasChanged();
-        });
-        if (_secondsToRun <= 0)
-        {
-            _timer.Stop();
-            TimerOut?.Invoke();
-        }
-    }
+    //         Time = TimeSpan.FromSeconds(_secondsToRun).ToString(@"mm\:ss");
+    //         StateHasChanged();
+    //     });
+    //     if (_secondsToRun <= 0)
+    //     {
+    //         _timer.Stop();
+    //         TimerOut?.Invoke();
+    //     }
+    // }
 
     //Tror inte jag använder Dispose() men jag har den ändå
-    public void Dispose()
-    {
-        _timer.Dispose();
-    }
+    // public void Dispose()
+    // {
+    //     _timer.Dispose();
+    // }
 
     private IEnumerable<QuizViewModel> quizzes = new List<QuizViewModel>();
 
@@ -123,9 +127,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _timer = new System.Timers.Timer(1000);
-        _timer.Elapsed += OnTimedEvent;
-        _timer.AutoReset = true;
+        // _timer = new System.Timers.Timer(1000);
+        // _timer.Elapsed += OnTimedEvent;
+        // _timer.AutoReset = true;
 
 
         try
@@ -136,10 +140,14 @@
         catch (AccessTokenNotAvailableException exception)
         {
             exception.Redirect();
-
+        }
+        if (quizzes != null)
+        {
+            noUserQuizMessage = true;
+            Console.WriteLine("No quizzes");
         }
 
-        StartTime(20);
+        // StartTime(20);
 
     }
 

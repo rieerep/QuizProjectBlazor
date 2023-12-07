@@ -6,23 +6,27 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 @using Microsoft.AspNetCore.Components
 
+@if (noQuestionsQuiz)
+{
+    <p> This quiz does not contain any questions. Choose another quiz!</p>
+}
+@if (gameOver == true)
+{
+    <div class="game-over">
+        <h2>Game Over</h2>
+        <p>Your score: @score</p>
+    </div>
+}
 
-@if (isLoading)
+@if (questions != null && questions.Count > 0)
 {
-    <p>Loading... </p>
-}
-@if (questions.Count() == 0)
-{
-    <p>message</p>
-    <p>quiz contains no questions.</p>
-}
     @if (gameOver == false)
+
+    @if (questionIndex < questions.Count)
     {
-
         <h3>Play quiz!</h3>
-        <div class="mediaquiz">
 
-            
+        <div class="mediaquiz">
             @if (questions[questionIndex].IncludingVideo == true)
             {
                 <iframe width="640" height="480" src="@questions[questionIndex].MediaURL"></iframe>
@@ -30,67 +34,56 @@
             @if (questions[questionIndex].IncludingImage == true)
             {
                 Console.WriteLine(@questions[questionIndex].MediaURL);
-                
+
                 <img src="@questions[questionIndex].MediaURL" width="500" />
             }
         </div>
-        
 
         <div class="quiz-container">
-        <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer.ToLower().Trim(), selectedAnswer.ToLower().Trim() )">
+            <EditForm Model="@questions" OnSubmit="() => CheckAnswer(questions[questionIndex].Answer.ToLower().Trim(), selectedAnswer.ToLower().Trim() )">
 
-            
+                @if (questions[questionIndex].TimeLimit > 0)
+                {
+                    <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
+                }
 
-            @if (questions[questionIndex].TimeLimit > 0)
-            {
-                <p id="timelimit-font">You have @questions[questionIndex].TimeLimit seconds to answer the question.</p>
-            }
+                <h4>@questions[questionIndex].Question</h4>
 
-            <h4>@questions[questionIndex].Question</h4>
-
-            @if (questions[questionIndex].HasMultipleAnswers == true)
-            {
+                @if (questions[questionIndex].HasMultipleAnswers == true)
+                {
                     @foreach (var option in options)
                     {
                         <li>
                             <button class="btn btn-primary" disabled="@isDisabled" @onclick="@(() => Click(option))">@option</button>
                         </li>
                     }
-            }
-            else
-            {
+                }
+                else
+                {
                     <label for="textinput">Type your answer</label>
-                    <input id="textinput"  type="text" class="form-control" @onchange="@((e) => TextAnswer(e.Value.ToString()))" disabled="@isDisabled" />
-            }
+                    <input id="textinput" type="text" class="form-control" @onchange="@((e) => TextAnswer(e.Value.ToString()))" disabled="@isDisabled" />
+                }
 
-            <p>Your answer: @selectedAnswer</p>
+                <p>Your answer: @selectedAnswer</p>
 
-            @if (isCorrectAnswer == true)
-            {
-                <p>Correct answer!</p>
-            }
+                @if (isCorrectAnswer == true)
+                {
+                    <p>Correct answer!</p>
+                }
 
-            @if (isWrongAnswer == true)
-            {
-                <p>Wrong answer!</p>
-            }
+                @if (isWrongAnswer == true)
+                {
+                    <p>Wrong answer!</p>
+                }
 
-            <p>Score: @score</p>
-            <button type="submit">Submit answer </button>
-        </EditForm>
+                <p>Score: @score</p>
+                <button type="submit">Submit answer </button>
+            </EditForm>
         </div>
     }
 
+}
 
-else
-{
-    <div class="game-over">
-        <h2>Game Over</h2>
-        
-        <p>Your score: @score</p>
-    </div>
-  
-    }           
 
 @code {
 
@@ -103,25 +96,29 @@ else
     bool isCorrectAnswer = false;
     bool isWrongAnswer = false;
     string timeUpAlert = "";
-    int timeLimit;
+    int timeLimit = 0;
     bool noQuestionsQuiz = false;
     bool isLoading = true;
     bool timeUp = false;
-    string message;
+    string message = "This quiz contains no questions. Try another one.";
 
     [Parameter]
     public Guid? PublicId { get; set; }
-
 
     private List<QuestionViewModel> questions = new List<QuestionViewModel>();
 
     private List<string> options = new List<string>();
 
-
     // Method to handle multiple options answers
     private void Click(string answer)
     {
         Console.WriteLine("Option: " + answer);
+        DateTime endTime = DateTime.Now;
+
+        TimeSpan elapsedTime = endTime - startTime;
+
+        int secondsElapsed = (int)elapsedTime.TotalSeconds;
+
         if (answer == questions[questionIndex].Answer)
         {
             isCorrectAnswer = true;
@@ -143,6 +140,9 @@ else
             Console.WriteLine("This is correct bool" + isCorrectAnswer);
             DateTime endTime = DateTime.Now;
 
+            TimeSpan elapsedTime = endTime - startTime;
+            int secondsElapsed = (int)elapsedTime.TotalSeconds;
+
             isCorrectAnswer = true;
         }
         else
@@ -162,14 +162,6 @@ else
         {
             questions = await Http.GetFromJsonAsync<List<QuestionViewModel>>($"api/quiz/chosenquiz/{PublicId}");
             isLoading = false;
-
-            if (questions == null || questions.Count == 0)
-            {
-                noQuestionsQuiz = true;
-                message = "The quiz does not contain any questions...";
-                return;
-            }
-
         }
         catch (AccessTokenNotAvailableException exception)
         {
@@ -188,6 +180,7 @@ else
             Shuffle(options);
 
         }
+        else noQuestionsQuiz = true;
     }
 
     // Random function to shuffle answers from the user
@@ -225,6 +218,8 @@ else
             timeUp = true;
             Console.WriteLine("Time out");
             timeUpAlert = "Time is up! No score.";
+
+            Thread.Sleep(2000);
         }
         else if (guess == answer)
         {
@@ -267,5 +262,6 @@ else
                 Score = score
             };
         await Http.PostAsJsonAsync("api/game/endgame", endgameModel /* new { PublicId = PublicId , score = score } */);
+        StateHasChanged();
     }
 }
